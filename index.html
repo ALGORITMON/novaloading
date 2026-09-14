@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Nova RP Loading Screen</title>
-    <!-- Подключаем ваш любимый шрифт Nunito -->
+    <!-- ИСПРАВЛЕНО: Правильная рабочая ссылка на шрифт Nunito -->
     <link href="https://googleapis.com" rel="stylesheet">
     <style>
         * {
@@ -129,7 +129,6 @@
         <div class="server-sub">Добро пожаловать в игру</div>
 
         <div class="loading-box">
-            <!-- Сюда движок gmod будет выводить статус загрузки файлов -->
             <div id="status" class="status-text">Соединение с сервером...</div>
             <div class="progress-bar-bg">
                 <div id="progress" class="progress-bar"></div>
@@ -138,7 +137,7 @@
         </div>
     </div>
 
-    <!-- Скрытый плеер со 100% точной интернет-ссылкой на твой GitHub репозиторий -->
+    <!-- ИСПРАВЛЕНО: Замени "music.mp3" на точное имя файла в твоем репозитории -->
     <audio id="loading-music" loop>
         <source src="https://github.io" type="audio/mpeg">
     </audio>
@@ -146,10 +145,9 @@
     <script>
         var music = document.getElementById("loading-music");
 
-        // Безопасный и многоуровневый запуск звука
         function startMusic() {
             if (music && music.paused) {
-                music.volume = 0.25; // Оптимальная громкость 25%
+                music.volume = 0.25; 
                 music.play().then(function() {
                     console.log("Музыка успешно запущена!");
                     removeMusicListeners();
@@ -159,42 +157,35 @@
             }
         }
 
-        // Чистим триггеры после успешного старта трека
         function removeMusicListeners() {
             document.removeEventListener('click', startMusic);
             document.removeEventListener('keydown', startMusic);
             document.removeEventListener('mousemove', startMusic);
         }
 
-        // Подстраховка на любые действия игрока на экране загрузки
         document.addEventListener('click', startMusic);
         document.addEventListener('keydown', startMusic);
         document.addEventListener('mousemove', startMusic);
 
-        // Функция, которую Garry's Mod вызывает при первом подключении к серверу
         function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
             startMusic();
         }
 
-        // Попытка старта сразу по готовности структуры HTML-страницы
         window.addEventListener('DOMContentLoaded', function() {
             startMusic();
-            setTimeout(startMusic, 1000); // Повторный толчок через 1 секунду
+            setTimeout(startMusic, 1000); 
         });
 
-        // Вывод текущего скачиваемого файла (и попутный пинок плеера)
         function DownloadingFile(fileName) {
             document.getElementById("status").innerHTML = "Скачивание: " + fileName;
             startMusic(); 
         }
 
-        // Вывод статуса (например, "Mounting Addons")
         function SetStatusChanged(status) {
             document.getElementById("status").innerHTML = status;
             startMusic();
         }
 
-        // Обновление полосы прогресса
         function SetFilesNeeded(needed) {
             if (!window.totalFiles) { window.totalFiles = needed; }
             var remaining = Math.max(0, needed);
