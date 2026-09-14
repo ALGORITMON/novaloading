@@ -1,3 +1,35 @@
+Skip to content
+ALGORITMON
+novaloading
+Repository navigation
+Code
+Issues
+Pull requests
+Agents
+Actions
+Projects
+Wiki
+Security and quality
+Insights
+Settings
+novaloading
+/index.html
+Go to file
+t
+T
+ALGORITMON
+ALGORITMON
+Update index.html
+d472c51
+ · 
+10 minutes ago
+novaloading
+/index.html
+
+Code
+
+Blame
+226 lines (208 loc) · 8.03 KB
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -122,64 +154,91 @@
 </head>
 <body>
 
-        <script>
-        var audio = null;
-        var musicStarted = false;
+        <!-- Удаляем старый тег <audio>, звук будет создаваться программно -->
 
-        // Инициализация загрузки файла через Blob
+    <script>
+        var audioCtx = null;
+        var audioBuffer = null;
+        var sourceNode = null;
+        var gainNode = null;
+        var isPlaying = false;
+
+        // 1. Функция загрузки и декодирования OGG файла
         function initAudio() {
+            if (isPlaying) return;
+
+            // Создаем аудио-контекст (поддерживает обход автоплея при активности)
+            window.AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+
+            // Создаем узел управления громкостью
+            gainNode = audioCtx.createGain();
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime); // Громкость 30%
+            gainNode.connect(audioCtx.destination);
+
+            // Скачиваем файл в бинарном виде
             var request = new XMLHttpRequest();
             request.open('GET', 'loading.ogg', true);
-            request.responseType = 'blob'; // Безопасный тип данных для GMod
+            request.responseType = 'arraybuffer';
 
             request.onload = function() {
-                if (request.status === 200) {
-                    // Создаем временную внутреннюю ссылку на файл в памяти
-                    var blob = request.response;
-                    var audioUrl = URL.createObjectURL(blob);
-                    
-                    // Создаем стандартный элемент аудио
-                    audio = new Audio();
-                    audio.src = audioUrl;
-                    audio.volume = 0.3; // Громкость 30%
-                    audio.loop = true;  // Зацикливание
-                    
-                    // Пробуем запустить
-                    tryPlayMusic();
-                }
+                audioCtx.decodeAudioData(request.responseBuffer || request.response, function(buffer) {
+                    audioBuffer = buffer;
+                    playMusic(); // Пробуем запустить сразу после загрузки в память
+                }, function(e) {
+                    console.error("Ошибка декодирования аудио: " + e.err);
+                });
             };
             request.send();
         }
 
-        // Функция принудительного воспроизведения
-        function tryPlayMusic() {
-            if (audio && !musicStarted) {
-                audio.play().then(function() {
-                    musicStarted = true;
-                }).catch(function(e) {
-                    // Игнорируем ошибку автоплея, движок GMod подтолкнет ее позже
-                    console.log("Ожидание триггера загрузки...");
-                });
+        // 2. Функция воспроизведения
+        function playMusic() {
+            if (!audioBuffer || isPlaying) return;
+
+            // Если контекст "спит" из-за политик Chromium, принудительно будим его
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            sourceNode = audioCtx.createBufferSource();
+            sourceNode.buffer = audioBuffer;
+            sourceNode.loop = true; // Зацикливание
+            sourceNode.connect(gainNode);
+            sourceNode.start(0);
+            isPlaying = true;
+        }
+
+        // Ловим любые сигналы от GMod, чтобы разбудить аудио-движок
+        function triggerAudioOnActivity() {
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            if (audioBuffer && !isPlaying) {
+                playMusic();
             }
         }
 
-        // Интеграция с движком Garry's Mod и пинки для аудио-движка
+        // Интеграция с движком Garry's Mod
         function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
-            tryPlayMusic();
+            triggerAudioOnActivity();
         }
 
+        // Вывод текущего скачиваемого файла
         function DownloadingFile(fileName) {
             document.getElementById("status").innerHTML = "Скачивание: " + fileName;
-            tryPlayMusic();
+            triggerAudioOnActivity();
         }
 
+        // Вывод статуса (например, "Mounting Addons")
         function SetStatusChanged(status) {
             document.getElementById("status").innerHTML = status;
-            tryPlayMusic();
+            triggerAudioOnActivity();
         }
 
+        // Обновление полосы прогресса
         function SetFilesNeeded(needed) {
-            tryPlayMusic();
+            triggerAudioOnActivity();
             if (!window.totalFiles) { window.totalFiles = needed; }
             var remaining = Math.max(0, needed);
             document.getElementById("files").innerHTML = "Осталось файлов: " + remaining;
@@ -191,7 +250,7 @@
             document.getElementById("progress").style.width = progress + "%";
         }
 
-        // Запуск скачивания при старте страницы
+        // Запуск процесса загрузки трека сразу при открытии страницы
         window.addEventListener("DOMContentLoaded", initAudio);
     </script>
 
