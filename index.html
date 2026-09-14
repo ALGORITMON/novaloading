@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Nova RP Loading Screen</title>
-    <!-- ИСПРАВЛЕНО: Правильная рабочая ссылка на шрифт Nunito -->
+    <!-- Подключаем ваш любимый шрифт Nunito -->
     <link href="https://googleapis.com" rel="stylesheet">
     <style>
         * {
@@ -129,6 +129,7 @@
         <div class="server-sub">Добро пожаловать в игру</div>
 
         <div class="loading-box">
+            <!-- Сюда движок gmod будет выводить статус загрузки файлов -->
             <div id="status" class="status-text">Соединение с сервером...</div>
             <div class="progress-bar-bg">
                 <div id="progress" class="progress-bar"></div>
@@ -137,66 +138,33 @@
         </div>
     </div>
 
-    <!-- ИСПРАВЛЕНО: Замени "music.mp3" на точное имя файла в твоем репозитории -->
-    <audio id="loading-music" loop>
-        <source src="https://github.io" type="audio/mpeg">
-    </audio>
-
     <script>
-        var music = document.getElementById("loading-music");
-
-        function startMusic() {
-            if (music && music.paused) {
-                music.volume = 0.25; 
-                music.play().then(function() {
-                    console.log("Музыка успешно запущена!");
-                    removeMusicListeners();
-                }).catch(function(error) {
-                    console.log("Блокировка автоплея Chromium: ", error);
-                });
-            }
-        }
-
-        function removeMusicListeners() {
-            document.removeEventListener('click', startMusic);
-            document.removeEventListener('keydown', startMusic);
-            document.removeEventListener('mousemove', startMusic);
-        }
-
-        document.addEventListener('click', startMusic);
-        document.addEventListener('keydown', startMusic);
-        document.addEventListener('mousemove', startMusic);
-
+        // Интеграция с движком Garry's Mod
         function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
-            startMusic();
+            // Можно использовать эти данные, если захотите выводить название карты
         }
 
-        window.addEventListener('DOMContentLoaded', function() {
-            startMusic();
-            setTimeout(startMusic, 1000); 
-        });
-
+        // Вывод текущего скачиваемого файла
         function DownloadingFile(fileName) {
             document.getElementById("status").innerHTML = "Скачивание: " + fileName;
-            startMusic(); 
         }
 
+        // Вывод статуса (например, "Mounting Addons")
         function SetStatusChanged(status) {
             document.getElementById("status").innerHTML = status;
-            startMusic();
         }
 
+        // Обновление полосы прогресса
         function SetFilesNeeded(needed) {
             if (!window.totalFiles) { window.totalFiles = needed; }
             var remaining = Math.max(0, needed);
             document.getElementById("files").innerHTML = "Осталось файлов: " + remaining;
-
+            
             var progress = 0;
             if (window.totalFiles > 0) {
                 progress = ((window.totalFiles - remaining) / window.totalFiles) * 100;
             }
             document.getElementById("progress").style.width = progress + "%";
-            startMusic();
         }
     </script>
 
