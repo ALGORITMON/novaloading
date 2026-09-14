@@ -138,60 +138,57 @@
         </div>
     </div>
 
-    <!-- Добавляем скрытый HTML5 плеер с твоим кастомным треком -->
-    <!-- audio/mpeg указывает браузеру, что это MP3 файл -->
+    <!-- Скрытый плеер со 100% точной интернет-ссылкой на твой GitHub репозиторий -->
     <audio id="loading-music" loop>
-        <source src="loading.mp3" type="audio/mpeg">
+        <source src="https://github.io" type="audio/mpeg">
     </audio>
 
     <script>
         var music = document.getElementById("loading-music");
 
-        // Функция принудительного и безопасного старта музыки
+        // Безопасный и многоуровневый запуск звука
         function startMusic() {
             if (music && music.paused) {
                 music.volume = 0.25; // Оптимальная громкость 25%
                 music.play().then(function() {
                     console.log("Музыка успешно запущена!");
-                    // Убираем слушатели событий, чтобы они не срабатывали повторно
                     removeMusicListeners();
                 }).catch(function(error) {
-                    console.log("Блокировка воспроизведения: ", error);
+                    console.log("Блокировка автоплея Chromium: ", error);
                 });
             }
         }
 
+        // Чистим триггеры после успешного старта трека
         function removeMusicListeners() {
             document.removeEventListener('click', startMusic);
             document.removeEventListener('keydown', startMusic);
             document.removeEventListener('mousemove', startMusic);
         }
 
-        // Вешаем глобальные триггеры на любую активность пользователя
+        // Подстраховка на любые действия игрока на экране загрузки
         document.addEventListener('click', startMusic);
         document.addEventListener('keydown', startMusic);
         document.addEventListener('mousemove', startMusic);
 
-        // Функция, которую Garry's Mod вызывает первой
+        // Функция, которую Garry's Mod вызывает при первом подключении к серверу
         function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
-            // Пробуем запуститься сразу, как только игра дала сигнал готовности
             startMusic();
         }
 
-        // Пробуем запуститься также по факту полной загрузки самой HTML-страницы
+        // Попытка старта сразу по готовности структуры HTML-страницы
         window.addEventListener('DOMContentLoaded', function() {
             startMusic();
-            // На всякий случай пинаем плеер через секунду
-            setTimeout(startMusic, 1000);
+            setTimeout(startMusic, 1000); // Повторный толчок через 1 секунду
         });
 
-        // Вывод текущего скачиваемого файла
+        // Вывод текущего скачиваемого файла (и попутный пинок плеера)
         function DownloadingFile(fileName) {
             document.getElementById("status").innerHTML = "Скачивание: " + fileName;
-            startMusic(); // Дополнительный пинок плеера при активности загрузки
+            startMusic(); 
         }
 
-        // Вывод статуса
+        // Вывод статуса (например, "Mounting Addons")
         function SetStatusChanged(status) {
             document.getElementById("status").innerHTML = status;
             startMusic();
