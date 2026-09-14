@@ -138,14 +138,33 @@
         </div>
     </div>
 
-       <script>
+    <!-- Добавляем скрытый HTML5 плеер с твоим кастомным треком -->
+    <!-- audio/mpeg указывает браузеру, что это MP3 файл -->
+    <audio id="loading-music" loop>
+        <source src="loading.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
         // Функция, которую Garry's Mod вызывает САМОЙ ПЕРВОЙ при старте экрана загрузки
         function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
-            // Запускаем встроенный, безопасный от АП трек из Half-Life 2
-            // "music/hl2_song14.mp3" — это очень стильный, качающий электронный ритм
-            if (window.location.search.indexOf("test") === -1) {
-                if (typeof gmod !== 'undefined' && gmod.PlaySound) {
-                    gmod.PlaySound("music/hl2_song14.mp3");
+            // Запускаем твой кастомный трек через HTML5 API
+            var music = document.getElementById("loading-music");
+            if (music) {
+                // Ставим комфортную громкость (0.3 = 30%), чтобы не глушить игроков
+                music.volume = 0.3; 
+                
+                // Пробуем запустить воспроизведение
+                var playPromise = music.play();
+                
+                // Подстраховка от блокировки автоплея браузером GMod
+                if (playPromise !== undefined) {
+                    playPromise.catch(function(error) {
+                        console.log("Автоплей заблокирован, пробуем обойти через событие...");
+                        // Если заблокировано, музыка включится при малейшем движении мыши игрока
+                        document.addEventListener('mousemove', function() {
+                            music.play();
+                        }, { once: true });
+                    });
                 }
             }
         }
@@ -165,7 +184,7 @@
             if (!window.totalFiles) { window.totalFiles = needed; }
             var remaining = Math.max(0, needed);
             document.getElementById("files").innerHTML = "Осталось файлов: " + remaining;
-            
+
             var progress = 0;
             if (window.totalFiles > 0) {
                 progress = ((window.totalFiles - remaining) / window.totalFiles) * 100;
@@ -173,7 +192,6 @@
             document.getElementById("progress").style.width = progress + "%";
         }
     </script>
-
 
 </body>
 </html>
