@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Nova RP Loading Screen</title>
-    <!-- Подключаем ваш любимый шрифт Nunito -->
-    <link href="https://googleapis.com" rel="stylesheet">
+    <!-- ИСПРАВЛЕНО: Правильное и полное подключение шрифта Nunito -->
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Nunito:wght@700;900&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -122,7 +124,7 @@
 </head>
 <body>
 
-    <!-- Нативная HTML5 аудиосистема, без перегрузки скриптами -->
+    <!-- Нативный плеер -->
     <audio id="loading-music" src="loading.ogg" loop></audio>
 
     <div class="background"></div>
@@ -142,29 +144,12 @@
 
     <script>
         var audio = document.getElementById("loading-music");
-        var isPlaying = false;
 
-        // Самый легкий способ запустить аудио без краша JS
         function startMusic() {
-            if (audio && !isPlaying) {
-                audio.volume = 0.3; // Ставим громкость 30%
-                var playPromise = audio.play();
-                
-                if (playPromise !== undefined) {
-                    playPromise.then(function() {
-                        isPlaying = true;
-                    }).catch(function(e) {
-                        // Браузер ожидает системного события загрузки файлов от Gmod
-                    });
-                }
+            if (audio) {
+                audio.volume = 0.3; // Громкость 30%
+                audio.play();
             }
-        }
-
-        // Запуск, как только файл частично прогрузится в кэш игры
-        if (audio) {
-            audio.oncanplaythrough = function() {
-                startMusic();
-            };
         }
 
         // Интеграция с движком Garry's Mod
