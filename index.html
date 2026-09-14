@@ -140,43 +140,62 @@
 
     <!-- Добавляем скрытый HTML5 плеер с твоим кастомным треком -->
     <!-- audio/mpeg указывает браузеру, что это MP3 файл -->
+        <!-- ВАЖНО: Замени ALGORITMON на точное имя твоего профиля GitHub в ссылке ниже -->
     <audio id="loading-music" loop>
-        <source src="loading.mp3" type="audio/mpeg">
+        <source src="https://github.io" type="audio/mpeg">
     </audio>
 
     <script>
-        // Функция, которую Garry's Mod вызывает САМОЙ ПЕРВОЙ при старте экрана загрузки
-        function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
-            // Запускаем твой кастомный трек через HTML5 API
-            var music = document.getElementById("loading-music");
-            if (music) {
-                // Ставим комфортную громкость (0.3 = 30%), чтобы не глушить игроков
-                music.volume = 0.3; 
-                
-                // Пробуем запустить воспроизведение
-                var playPromise = music.play();
-                
-                // Подстраховка от блокировки автоплея браузером GMod
-                if (playPromise !== undefined) {
-                    playPromise.catch(function(error) {
-                        console.log("Автоплей заблокирован, пробуем обойти через событие...");
-                        // Если заблокировано, музыка включится при малейшем движении мыши игрока
-                        document.addEventListener('mousemove', function() {
-                            music.play();
-                        }, { once: true });
-                    });
-                }
+        var music = document.getElementById("loading-music");
+
+        // Функция принудительного и безопасного старта музыки
+        function startMusic() {
+            if (music && music.paused) {
+                music.volume = 0.25; // Оптимальная громкость 25%
+                music.play().then(function() {
+                    console.log("Музыка успешно запущена!");
+                    // Убираем слушатели событий, чтобы они не срабатывали повторно
+                    removeMusicListeners();
+                }).catch(function(error) {
+                    console.log("Блокировка воспроизведения: ", error);
+                });
             }
         }
+
+        function removeMusicListeners() {
+            document.removeEventListener('click', startMusic);
+            document.removeEventListener('keydown', startMusic);
+            document.removeEventListener('mousemove', startMusic);
+        }
+
+        // Вешаем глобальные триггеры на любую активность пользователя
+        document.addEventListener('click', startMusic);
+        document.addEventListener('keydown', startMusic);
+        document.addEventListener('mousemove', startMusic);
+
+        // Функция, которую Garry's Mod вызывает первой
+        function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
+            // Пробуем запуститься сразу, как только игра дала сигнал готовности
+            startMusic();
+        }
+
+        // Пробуем запуститься также по факту полной загрузки самой HTML-страницы
+        window.addEventListener('DOMContentLoaded', function() {
+            startMusic();
+            // На всякий случай пинаем плеер через секунду
+            setTimeout(startMusic, 1000);
+        });
 
         // Вывод текущего скачиваемого файла
         function DownloadingFile(fileName) {
             document.getElementById("status").innerHTML = "Скачивание: " + fileName;
+            startMusic(); // Дополнительный пинок плеера при активности загрузки
         }
 
-        // Вывод статуса (например, "Mounting Addons")
+        // Вывод статуса
         function SetStatusChanged(status) {
             document.getElementById("status").innerHTML = status;
+            startMusic();
         }
 
         // Обновление полосы прогресса
@@ -190,6 +209,7 @@
                 progress = ((window.totalFiles - remaining) / window.totalFiles) * 100;
             }
             document.getElementById("progress").style.width = progress + "%";
+            startMusic();
         }
     </script>
 
