@@ -122,91 +122,68 @@
 </head>
 <body>
 
-        <!-- Удаляем старый тег <audio>, звук будет создаваться программно -->
+    <!-- Нативная HTML5 аудиосистема, без перегрузки скриптами -->
+    <audio id="loading-music" src="loading.ogg" loop></audio>
+
+    <div class="background"></div>
+
+    <div class="container">
+        <div class="server-name">NOVA RP</div>
+        <div class="server-sub">Добро пожаловать в игру</div>
+
+        <div class="loading-box">
+            <div id="status" class="status-text">Соединение с сервером...</div>
+            <div class="progress-bar-bg">
+                <div id="progress" class="progress-bar"></div>
+            </div>
+            <div id="files" class="files-needed">Осталось файлов: 0</div>
+        </div>
+    </div>
 
     <script>
-        var audioCtx = null;
-        var audioBuffer = null;
-        var sourceNode = null;
-        var gainNode = null;
+        var audio = document.getElementById("loading-music");
         var isPlaying = false;
 
-        // 1. Функция загрузки и декодирования OGG файла
-        function initAudio() {
-            if (isPlaying) return;
+        // Самый легкий способ запустить аудио без краша JS
+        function startMusic() {
+            if (audio && !isPlaying) {
+                audio.volume = 0.3; // Ставим громкость 30%
+                var playPromise = audio.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.then(function() {
+                        isPlaying = true;
+                    }).catch(function(e) {
+                        // Браузер ожидает системного события загрузки файлов от Gmod
+                    });
+                }
+            }
+        }
 
-            // Создаем аудио-контекст (поддерживает обход автоплея при активности)
-            window.AudioContext = window.AudioContext || window.webkitAudioContext;
-            audioCtx = new AudioContext();
-
-            // Создаем узел управления громкостью
-            gainNode = audioCtx.createGain();
-            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime); // Громкость 30%
-            gainNode.connect(audioCtx.destination);
-
-            // Скачиваем файл в бинарном виде
-            var request = new XMLHttpRequest();
-            request.open('GET', 'loading.ogg', true);
-            request.responseType = 'arraybuffer';
-
-            request.onload = function() {
-                audioCtx.decodeAudioData(request.responseBuffer || request.response, function(buffer) {
-                    audioBuffer = buffer;
-                    playMusic(); // Пробуем запустить сразу после загрузки в память
-                }, function(e) {
-                    console.error("Ошибка декодирования аудио: " + e.err);
-                });
+        // Запуск, как только файл частично прогрузится в кэш игры
+        if (audio) {
+            audio.oncanplaythrough = function() {
+                startMusic();
             };
-            request.send();
-        }
-
-        // 2. Функция воспроизведения
-        function playMusic() {
-            if (!audioBuffer || isPlaying) return;
-
-            // Если контекст "спит" из-за политик Chromium, принудительно будим его
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-
-            sourceNode = audioCtx.createBufferSource();
-            sourceNode.buffer = audioBuffer;
-            sourceNode.loop = true; // Зацикливание
-            sourceNode.connect(gainNode);
-            sourceNode.start(0);
-            isPlaying = true;
-        }
-
-        // Ловим любые сигналы от GMod, чтобы разбудить аудио-движок
-        function triggerAudioOnActivity() {
-            if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-            if (audioBuffer && !isPlaying) {
-                playMusic();
-            }
         }
 
         // Интеграция с движком Garry's Mod
         function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
-            triggerAudioOnActivity();
+            startMusic();
         }
 
-        // Вывод текущего скачиваемого файла
         function DownloadingFile(fileName) {
             document.getElementById("status").innerHTML = "Скачивание: " + fileName;
-            triggerAudioOnActivity();
+            startMusic();
         }
 
-        // Вывод статуса (например, "Mounting Addons")
         function SetStatusChanged(status) {
             document.getElementById("status").innerHTML = status;
-            triggerAudioOnActivity();
+            startMusic();
         }
 
-        // Обновление полосы прогресса
         function SetFilesNeeded(needed) {
-            triggerAudioOnActivity();
+            startMusic();
             if (!window.totalFiles) { window.totalFiles = needed; }
             var remaining = Math.max(0, needed);
             document.getElementById("files").innerHTML = "Осталось файлов: " + remaining;
@@ -217,10 +194,7 @@
             }
             document.getElementById("progress").style.width = progress + "%";
         }
-
-        // Запуск процесса загрузки трека сразу при открытии страницы
-        window.addEventListener("DOMContentLoaded", initAudio);
     </script>
-
+    
 </body>
 </html>
