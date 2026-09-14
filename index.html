@@ -138,10 +138,16 @@
         </div>
     </div>
 
-    <script>
-        // Интеграция с движком Garry's Mod
+       <script>
+        // Функция, которую Garry's Mod вызывает САМОЙ ПЕРВОЙ при старте экрана загрузки
         function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
-            // Можно использовать эти данные, если захотите выводить название карты
+            // Запускаем встроенный, безопасный от АП трек из Half-Life 2
+            // "music/hl2_song14.mp3" — это очень стильный, качающий электронный ритм
+            if (window.location.search.indexOf("test") === -1) {
+                if (typeof gmod !== 'undefined' && gmod.PlaySound) {
+                    gmod.PlaySound("music/hl2_song14.mp3");
+                }
+            }
         }
 
         // Вывод текущего скачиваемого файла
@@ -167,6 +173,7 @@
             document.getElementById("progress").style.width = progress + "%";
         }
     </script>
+
 
 </body>
 </html>
