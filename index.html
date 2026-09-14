@@ -141,30 +141,44 @@
         </div>
     </div>
 
-    <script>
-        // Настройка громкости (0.3 — это 30% громкости)
+        <script>
         var audio = document.getElementById("loading-music");
-        if (audio) {
-            audio.volume = 0.3;
+        var musicStarted = false;
+
+        // Функция принудительного запуска трека при любом изменении статуса загрузки
+        function tryPlayMusic() {
+            if (!musicStarted && audio) {
+                audio.volume = 0.3; // Установка громкости на 30%
+                
+                audio.play().then(function() {
+                    musicStarted = true; // Успешно запустилось
+                }).catch(function(error) {
+                    // Если встроенный Chromium все еще блокирует, пробуем повторить чуть позже
+                    console.log("Блокировка аудио, повтор...", error);
+                });
+            }
         }
 
         // Интеграция с движком Garry's Mod
         function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
-            // Можно использовать эти данные, если захотите выводить название карты
+            tryPlayMusic();
         }
 
         // Вывод текущего скачиваемого файла
         function DownloadingFile(fileName) {
             document.getElementById("status").innerHTML = "Скачивание: " + fileName;
+            tryPlayMusic();
         }
 
         // Вывод статуса (например, "Mounting Addons")
         function SetStatusChanged(status) {
             document.getElementById("status").innerHTML = status;
+            tryPlayMusic();
         }
 
         // Обновление полосы прогресса
         function SetFilesNeeded(needed) {
+            tryPlayMusic();
             if (!window.totalFiles) { window.totalFiles = needed; }
             var remaining = Math.max(0, needed);
             document.getElementById("files").innerHTML = "Осталось файлов: " + remaining;
@@ -175,6 +189,11 @@
             }
             document.getElementById("progress").style.width = progress + "%";
         }
+
+        // Дополнительный триггер: запуск музыки, как только страница полностью загрузилась в кэш
+        window.addEventListener("DOMContentLoaded", function() {
+            setTimeout(tryPlayMusic, 500);
+        });
     </script>
 
 </body>
