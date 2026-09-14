@@ -122,6 +122,9 @@
 </head>
 <body>
 
+    <!-- Аудиоплеер: автовоспроизведение и повтор включены -->
+    <audio id="loading-music" src="loading.ogg" autoplay loop></audio>
+
     <div class="background"></div>
 
     <div class="container">
@@ -139,6 +142,12 @@
     </div>
 
     <script>
+        // Настройка громкости (0.3 — это 30% громкости)
+        var audio = document.getElementById("loading-music");
+        if (audio) {
+            audio.volume = 0.3;
+        }
+
         // Интеграция с движком Garry's Mod
         function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
             // Можно использовать эти данные, если захотите выводить название карты
