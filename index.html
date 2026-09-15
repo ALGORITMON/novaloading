@@ -142,14 +142,34 @@
         </div>
     </div>
 
-    <script>
+        <script>
         var audio = document.getElementById("loading-music");
+        var isFading = false; // Флаг, чтобы затухание не запускалось несколько раз
 
         function startMusic() {
-            if (audio) {
-                audio.volume = 0.3; // Громкость 30%
-                audio.play();
+            // Запускаем музыку, только если еще не началось затухание
+            if (audio && audio.paused && !isFading) {
+                audio.volume = 0.3; // Начальная громкость 30%
+                audio.play().catch(function(e) {
+                    console.log("Автовоспроизведение заблокировано браузером до первого клика");
+                });
             }
+        }
+
+        // Функция плавного уменьшения громкости
+        function fadeOutMusic() {
+            if (!audio || isFading) return;
+            isFading = true;
+
+            var fadeInterval = setInterval(function() {
+                if (audio.volume > 0.02) {
+                    audio.volume -= 0.02; // Шаг уменьшения громкости (чем меньше, тем плавнее)
+                } else {
+                    audio.volume = 0;
+                    audio.pause();
+                    clearInterval(fadeInterval); // Останавливаем таймер затухания
+                }
+            }, 50); // Интервал в миллисекундах (50 мс = очень плавное затухание ~1 секунда)
         }
 
         // Интеграция с движком Garry's Mod
@@ -164,7 +184,14 @@
 
         function SetStatusChanged(status) {
             document.getElementById("status").innerHTML = status;
-            startMusic();
+            
+            // Проверяем, содержит ли статус строку завершения соединения
+            // Применяем приведение к нижнему регистру (toLowerCase), чтобы избежать проблем с регистром букв
+            if (status.toLowerCase().trim() === "fully connected" || status === "Полное подключение") {
+                fadeOutMusic();
+            } else {
+                startMusic();
+            }
         }
 
         function SetFilesNeeded(needed) {
