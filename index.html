@@ -190,8 +190,9 @@
 
             // Перехватываем начало загрузки Lua-скриптов или финал подключения
             if (currentStatus === "Lua Started!" || 
-                currentStatus === "запуск lua" || 
-                currentStatus === "Fully Connected!") {
+                currentStatus === "Starting Lua..." || 
+                currentStatus === "Fully Connected!" ||
+                currentStatus === "Client info sent!"){
                 fadeOutMusic();
             } else {
                 startMusic();
