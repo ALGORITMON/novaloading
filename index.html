@@ -185,9 +185,13 @@
         function SetStatusChanged(status) {
             document.getElementById("status").innerHTML = status;
             
-            // Проверяем, содержит ли статус строку завершения соединения
-            // Применяем приведение к нижнему регистру (toLowerCase), чтобы избежать проблем с регистром букв
-            if (status.toLowerCase().trim() === "fully connected" || status === "Полное подключение") {
+            // Переводим в нижний регистр и убираем лишние пробелы для надежности
+            var currentStatus = status.toLowerCase().trim();
+
+            // Перехватываем начало загрузки Lua-скриптов или финал подключения
+            if (currentStatus === "Lua Started!" || 
+                currentStatus === "запуск lua" || 
+                currentStatus === "Fully Connected") {
                 fadeOutMusic();
             } else {
                 startMusic();
