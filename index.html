@@ -183,21 +183,21 @@
     }
 
     function SetStatusChanged(status) {
-        document.getElementById("status").innerHTML = status;
+    document.getElementById("status").innerHTML = status;
 
-        // Переводим в нижний регистр и убираем лишние пробелы для надежности
-        var currentStatus = status.toLowerCase().trim();
+    // Убираем .toLowerCase(), оставляем только удаление случайных пробелов по краям
+    var currentStatus = status.trim();
 
-        // ИСПРАВЛЕНО: Строки для сравнения приведены к нижнему регистру
-        if (currentStatus === "lua started!" || 
-            currentStatus === "starting lua..." || 
-            currentStatus === "fully connected!" ||
-            currentStatus === "client info sent!") {
-            fadeOutMusic();
-        } else {
-            startMusic();
-        }
+    // ИСПРАВЛЕНО: Строгое соответствие регистру Garry's Mod
+    if (currentStatus === "Lua Started!" || 
+        currentStatus === "Starting Lua..." || 
+        currentStatus === "Fully Connected!" ||
+        currentStatus === "Client info sent!") {
+        fadeOutMusic();
+    } else {
+        startMusic();
     }
+}
 
     function SetFilesNeeded(needed) {
         startMusic();
@@ -212,7 +212,6 @@
         document.getElementById("progress").style.width = progress + "%";
     }
 </script>
-
     
 </body>
 </html>
