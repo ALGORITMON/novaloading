@@ -169,7 +169,7 @@
                 audio.pause();
                 clearInterval(fadeInterval); // Останавливаем таймер затухания
             }
-        }, 50); // Интервал в миллисекундах (~1 секунда до полного затихания)
+        }, 300); // Интервал в миллисекундах (~1 секунда до полного затихания)
     }
 
     // Интеграция с движком Garry's Mod
@@ -189,10 +189,7 @@
     var currentStatus = status.trim();
 
     // ИСПРАВЛЕНО: Строгое соответствие регистру Garry's Mod
-    if (currentStatus === "Lua Started!" || 
-        currentStatus === "Starting Lua..." || 
-        currentStatus === "Fully Connected!" ||
-        currentStatus === "Client info sent!") {
+    if (currentStatus === "Client info sent!") {
         fadeOutMusic();
     } else {
         startMusic();
