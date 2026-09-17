@@ -142,76 +142,77 @@
         </div>
     </div>
 
-        <script>
-        var audio = document.getElementById("loading-music");
-        var isFading = false; // Флаг, чтобы затухание не запускалось несколько раз
+<script>
+    var audio = document.getElementById("loading-music");
+    var isFading = false; // Флаг, чтобы затухание не запускалось несколько раз
 
-        function startMusic() {
-            // Запускаем музыку, только если еще не началось затухание
-            if (audio && audio.paused && !isFading) {
-                audio.volume = 0.2; // Начальная громкость 20%
-                audio.play().catch(function(e) {
-                    console.log("Автовоспроизведение заблокировано браузером до первого клика");
-                });
-            }
+    function startMusic() {
+        // Запускаем музыку, только если еще не началось затухание
+        if (audio && audio.paused && !isFading) {
+            audio.volume = 0.2; // Начальная громкость 20%
+            audio.play().catch(function(e) {
+                console.log("Автовоспроизведение заблокировано браузером до первого клика");
+            });
         }
+    }
 
-        // Функция плавного уменьшения громкости
-        function fadeOutMusic() {
-            if (!audio || isFading) return;
-            isFading = true;
+    // Функция плавного уменьшения громкости
+    function fadeOutMusic() {
+        if (!audio || isFading) return;
+        isFading = true;
 
-            var fadeInterval = setInterval(function() {
-                if (audio.volume > 0.02) {
-                    audio.volume -= 0.02; // Шаг уменьшения громкости (чем меньше, тем плавнее)
-                } else {
-                    audio.volume = 0;
-                    audio.pause();
-                    clearInterval(fadeInterval); // Останавливаем таймер затухания
-                }
-            }, 50); // Интервал в миллисекундах (50 мс = очень плавное затухание ~1 секунда)
-        }
-
-        // Интеграция с движком Garry's Mod
-        function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
-            startMusic();
-        }
-
-        function DownloadingFile(fileName) {
-            document.getElementById("status").innerHTML = "Скачивание: " + fileName;
-            startMusic();
-        }
-
-        function SetStatusChanged(status) {
-            document.getElementById("status").innerHTML = status;
-            
-            // Переводим в нижний регистр и убираем лишние пробелы для надежности
-            var currentStatus = status.toLowerCase().trim();
-
-            // Перехватываем начало загрузки Lua-скриптов или финал подключения
-            if (currentStatus === "Lua Started!" || 
-                currentStatus === "Starting Lua..." || 
-                currentStatus === "Fully Connected!" ||
-                currentStatus === "Client info sent!"){
-                fadeOutMusic();
+        var fadeInterval = setInterval(function() {
+            if (audio.volume > 0.02) {
+                audio.volume -= 0.02; // Шаг уменьшения громкости
             } else {
-                startMusic();
+                audio.volume = 0;
+                audio.pause();
+                clearInterval(fadeInterval); // Останавливаем таймер затухания
             }
-        }
+        }, 50); // Интервал в миллисекундах (~1 секунда до полного затихания)
+    }
 
-        function SetFilesNeeded(needed) {
+    // Интеграция с движком Garry's Mod
+    function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
+        startMusic();
+    }
+
+    function DownloadingFile(fileName) {
+        document.getElementById("status").innerHTML = "Скачивание: " + fileName;
+        startMusic();
+    }
+
+    function SetStatusChanged(status) {
+        document.getElementById("status").innerHTML = status;
+
+        // Переводим в нижний регистр и убираем лишние пробелы для надежности
+        var currentStatus = status.toLowerCase().trim();
+
+        // ИСПРАВЛЕНО: Строки для сравнения приведены к нижнему регистру
+        if (currentStatus === "lua started!" || 
+            currentStatus === "starting lua..." || 
+            currentStatus === "fully connected!" ||
+            currentStatus === "client info sent!") {
+            fadeOutMusic();
+        } else {
             startMusic();
-            if (!window.totalFiles) { window.totalFiles = needed; }
-            var remaining = Math.max(0, needed);
-            document.getElementById("files").innerHTML = "Осталось файлов: " + remaining;
-            
-            var progress = 0;
-            if (window.totalFiles > 0) {
-                progress = ((window.totalFiles - remaining) / window.totalFiles) * 100;
-            }
-            document.getElementById("progress").style.width = progress + "%";
         }
-    </script>
+    }
+
+    function SetFilesNeeded(needed) {
+        startMusic();
+        if (!window.totalFiles) { window.totalFiles = needed; }
+        var remaining = Math.max(0, needed);
+        document.getElementById("files").innerHTML = "Осталось файлов: " + remaining;
+
+        var progress = 0;
+        if (window.totalFiles > 0) {
+            progress = ((window.totalFiles - remaining) / window.totalFiles) * 100;
+        }
+        document.getElementById("progress").style.width = progress + "%";
+    }
+</script>
+
     
 </body>
 </html>
