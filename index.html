@@ -149,7 +149,7 @@
     function startMusic() {
         // Запускаем музыку, только если еще не началось затухание
         if (audio && audio.paused && !isFading) {
-            audio.volume = 0.2; // Начальная громкость 20%
+            audio.volume = 0.3; // Начальная громкость 30%
             audio.play().catch(function(e) {
                 console.log("Автовоспроизведение заблокировано браузером до первого клика");
             });
