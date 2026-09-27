@@ -165,7 +165,7 @@
                 </div>
 
                 <!-- ИСПРАВЛЕНО: тип кнопки изменен на обычный button, а функция вызывается через onclick -->
-                <button type="button" class="btn-submit" onclick="submitLogin()">Войти в аккаунт</button>
+                <button type="button" class="btn-submit" onclick="await submitLogin()">Войти в аккаунт</button>
             </form>
 
             <div class="login-footer">
@@ -309,19 +309,27 @@
     <!-- Подключаем надежную библиотеку криптографии SHA-256 -->
     <script src="https://cloudflare.com"></script>
 
-    <!-- Защищенная функция проверки логина и пароля -->
+    <!-- Никаких внешних библиотек! Используем встроенное в браузер шифрование -->
     <script>
-        function submitLogin() {
+        // Функция, которая превращает пароль в хэш с помощью встроенных инструментов браузера
+        async function submitLogin() {
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
 
-            // Хэшируем пароль, который ты только что ввел в окошко
-            const hashedPassword = CryptoJS.SHA256(pass).toString();
+            // Кодируем текст пароля в байты
+            const msgBuffer = new TextEncoder().encode(pass);
+            
+            // Хэшируем встроенным в браузер методом SHA-256
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            
+            // Превращаем результат в читаемую строку из букв и цифр
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashedPassword = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
             // Твой зашифрованный хэш от пароля "NOVA_ADMIN_2026"
             const targetHash = "4bf59f77fecfb883adfa8916327b7f168018bf0a65bc5c30fbdb730be78c3c43";
 
-            // Проверяем логин и сравниваем хэши (сам пароль в коде больше НЕ СУЩЕСТВУЕТ!)
+            // Сравниваем логин и хэши
             if (user === "admin" && hashedPassword === targetHash) {
                 localStorage.setItem('nova_admin_session', 'active');
                 alert("Успешный вход! Доступ к управлению сайтом разрешен.");
@@ -334,5 +342,6 @@
 
     <!-- Твой внешний скрипт проверки сессии -->
     <script src="auth-check.js"></script>
+
 </body>
 </html>
