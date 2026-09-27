@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Донат — NOVA RP</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Шапка сайта (active переносим на Донат) -->
+    <header>
+        <div class="logo">NOVA <span>RP</span></div>
+        <nav>
+            <a href="index.html">Главная</a>
+            <a href="rules.html">Правила</a>
+            <a href="jobs.html">Профессии</a>
+            <a href="donate.html" class="active">Донат</a>
+            <a href="team.html">Команда</a>
+            <a href="faq.html">FAQ</a>
+
+            <button class="btn-login" id="nav-login-btn" onclick="handleLoginClick()">Вход</button>
+        </nav>
+    </header>
+
+    <main class="donate-container">
+        <h1>Привилегии сервера <span class="accent-text">NOVA RP</span></h1>
+        <p class="donate-subtitle">Поддержите проект и получите уникальные игровые возможности, кастомные скины и права.</p>
+
+        <!-- Сетка тарифных планов -->
+        <div class="donate-grid">
+            
+            <!-- Тариф 1: VIP -->
+            <div class="donate-card">
+                <div class="donate-header">
+                    <h3>VIP статус</h3>
+                    <div class="price">199 <span>₽ / мес</span></div>
+                </div>
+                <ul class="donate-features">
+                    <li>🟢 Уникальный префикс [VIP] в чате</li>
+                    <li>🟢 Доступ к 5+ эксклюзивным профессиям</li>
+                    <li>🟢 +25% к ежеминутной зарплате</li>
+                    <li>🟢 Лимит пропов увеличен до 50</li>
+                </ul>
+                <a href="#" class="btn btn-secondary donate-btn">Купить</a>
+            </div>
+
+            <!-- Тариф 2: PREMIUM (Популярный — с неоновым выделением) -->
+            <div class="donate-card featured">
+                <div class="popular-badge">Популярно</div>
+                <div class="donate-header">
+                    <h3>PREMIUM</h3>
+                    <div class="price">399 <span>₽ / мес</span></div>
+                </div>
+                <ul class="donate-features">
+                    <li>🟣 Все возможности VIP-статуса</li>
+                    <li>🟣 Префикс [PREMIUM] золотым цветом</li>
+                    <li>🟣 Доступ ко ВСЕМ скрытым профессиям</li>
+                    <li>🟣 Своя точка спавна и кастомный хитмаркер</li>
+                    <li>🟣 Иммунитет к кику за АФК</li>
+                </ul>
+                <a href="#" class="btn btn-primary donate-btn">Купить</a>
+            </div>
+
+            <!-- Тариф 3: ADMIN -->
+            <div class="donate-card">
+                <div class="donate-header">
+                    <h3> Sponsor Admin</h3>
+                    <div class="price">799 <span>₽ / мес</span></div>
+                </div>
+                <ul class="donate-features">
+                    <li>🔴 Права модератора (ulx/sam меню)</li>
+                    <li>🔴 Возможность разбирать жалобы игроков</li>
+                    <li>🔴 Доступ к админ-профессиям (AdminMod)</li>
+                    <li>🔴 Уведомления о нарушениях в реальном времени</li>
+                </ul>
+                <a href="#" class="btn btn-secondary donate-btn">Купить</a>
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 NOVA RP. Все права защищены. Сервер не связан с Valve Corporation.</p>
+    </footer>
+
+    <script src="auth-check.js"></script>
+
+</body>
+</html>

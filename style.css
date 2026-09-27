@@ -1,0 +1,1204 @@
+/* Подключаем шрифт Nunito из Google Fonts */
+@import url('https://googleapis.com');
+
+/* ==========================================================================
+   1. СБРОС СТИЛЕЙ И БАЗОВЫЕ НАСТРОЙКИ (В СТИЛЕ NOVA RP)
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Nunito', sans-serif; /* Главный шрифт из твоего дизайна */
+}
+
+body {
+    background: radial-gradient(circle at center, #130924 0%, #05020a 100%);
+    color: #b9b3c4;
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+
+   /* Убираем стандартный скроллбар в браузере */
+    scrollbar-width: none; /* Скрывает скроллбар в Firefox */
+    -ms-overflow-style: none; /* Скрывает скроллбар в старом IE и Edge */
+    overflow-y: scroll; /* Сохраняет прокрутку колесиком мыши */
+}
+
+/* Скрывает скроллбар во всех современных браузерах (Chrome, Safari, Opera, Яндекс, новый Edge) */
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+    display: none;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* ==========================================================================
+   2. ШАПКА САЙТА (НАВИГАЦИЯ) — ФИНАЛЬНЫЙ CSS-МОНОЛИТ
+   ========================================================================== */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    /* Жестко фиксируем высоту шапки, чтобы она не прыгала */
+    height: 90px; 
+    
+    /* Фиксированные отступы по бокам */
+    padding: 0 8%; 
+    
+    background-color: rgba(5, 2, 10, 0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(138, 92, 246, 0.15);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    
+    /* Насильно сбрасываем любые внешние влияния */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.logo {
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    color: #fff;
+    text-transform: uppercase;
+    
+    /* Запрещаем логотипу сжиматься или растягиваться */
+    flex: 0 0 auto; 
+    line-height: 1;
+}
+
+.logo span {
+    color: #a855f7;
+    text-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    
+    /* Навигация занимает свое фиксированное место */
+    flex: 0 0 auto; 
+    height: 100%;
+}
+
+nav a {
+    font-size: 15px;
+    font-weight: 700;
+    margin-left: 30px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #94a3b8;
+    
+    /* Запрещаем тексту переноситься или деформироваться */
+    white-space: nowrap; 
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+    
+    /* Выравниваем ссылки по центру высоты шапки */
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+nav a:hover, nav a.active {
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Кнопка входа в шапке */
+.btn-login {
+    background-color: transparent;
+    border: 1px solid rgba(138, 92, 246, 0.4);
+    color: #a855f7;
+    padding: 6px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 4px;
+    margin-left: 30px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-login:hover {
+    background-color: #a855f7;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+    border-color: #a855f7;
+}
+
+/* Если админ залогинен — кнопка становится зеленой */
+.btn-login.logged-in {
+    border-color: rgba(34, 197, 94, 0.4);
+    color: #4ade80;
+}
+.btn-login.logged-in:hover {
+    background-color: #ef4444;
+    border-color: #ef4444;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+}
+
+
+
+
+/* ==========================================================================
+   3. ГЛАВНЫЙ БАННЕР (HERO SECTION)
+   ========================================================================== */
+.hero {
+    height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 20px;
+}
+
+.hero-content h1 {
+    font-size: 54px;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+.neon-text {
+    /* Точное повторение эффекта с твоего загрузочного экрана */
+    color: #fff;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+}
+
+.hero-content p {
+    font-size: 15px;
+    font-weight: 600;
+    max-width: 600px;
+    margin: 0 auto 35px auto;
+    color: #a855f7; /* Фиолетовый подзаголовок "ДОБРО ПОЖАЛОВАТЬ В ИГРУ" */
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Статус сервера (Стилизован под плашку "Соединение с сервером") */
+.server-status {
+    display: inline-flex;
+    align-items: center;
+    background-color: rgba(19, 9, 36, 0.6);
+    padding: 14px 28px;
+    border-radius: 6px;
+    margin-bottom: 35px;
+    border: 1px solid rgba(138, 92, 246, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    background-color: #a855f7;
+    border-radius: 50%;
+    margin-right: 12px;
+    box-shadow: 0 0 10px #a855f7;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.9); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(0.9); opacity: 0.5; }
+}
+
+.server-status p {
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin: 0;
+}
+
+/* Кнопки */
+.btn-group {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.btn {
+    padding: 14px 32px;
+    font-size: 14px;
+    font-weight: 800;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.btn-primary {
+    background-color: #fff;
+    color: #05020a;
+    border: none;
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+}
+
+.btn-primary:hover {
+    background-color: #a855f7;
+    color: #fff;
+    box-shadow: 0 0 25px rgba(168, 85, 247, 0.5);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-secondary:hover {
+    border-color: #fff;
+    background-color: rgba(255, 255, 255, 0.05);
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   ЖИВАЯ АТЛАСНАЯ ВУАЛЬ (ЭФФЕКТ РАЗВИВАЮЩЕЙСЯ ТКАНИ)
+   ========================================================================== */
+
+.space-veil {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    /* Добавим легкое размытие на весь экран для пущей мягкости шёлка */
+    filter: blur(50px); 
+}
+
+.nebula-cloud {
+    position: absolute;
+    mix-blend-mode: screen;
+    opacity: 0.18; /* Мягкая, ненавязчивая видимость */
+    transition: all 0.5s ease;
+}
+
+/* Первая большая фиолетовая складка ткани */
+.cloud-1 {
+    top: -20%;
+    left: -10%;
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(ellipse at center, #a855f7 0%, transparent 75%);
+    /* Анимация: одновременно двигаем волну по экрану и деформируем форму круга */
+    animation: 
+        moveSilkOne 22s infinite ease-in-out alternate,
+        waveSilkOne 12s infinite ease-in-out alternate;
+}
+
+/* Вторая сине-фиолетовая складка ткани с другой стороны */
+.cloud-2 {
+    bottom: -20%;
+    right: -10%;
+    width: 900px;
+    height: 900px;
+    background: radial-gradient(ellipse at center, #4f46e5 0%, transparent 75%);
+    animation: 
+        moveSilkTwo 28s infinite ease-in-out alternate,
+        waveSilkTwo 16s infinite ease-in-out alternate;
+}
+
+/* ==========================================================================
+   МАГИЯ ДЕФОРМАЦИИ (ИМИТАЦИЯ СКЛАДОК И ВОЛН ТКАНИ)
+   ========================================================================== */
+
+/* Волна для первой складки (меняем border-radius по кругу, создавая изгибы шёлка) */
+@keyframes waveSilkOne {
+    0% {
+        border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+    }
+    50% {
+        border-radius: 70% 30% 52% 48% / 60% 40% 60% 40%;
+    }
+    100% {
+        border-radius: 35% 65% 30% 70% / 30% 70% 30% 70%;
+    }
+}
+
+/* Волна для второй складки */
+@keyframes waveSilkTwo {
+    0% {
+        border-radius: 50% 50% 30% 70% / 50% 60% 40% 50%;
+    }
+    50% {
+        border-radius: 30% 70% 70% 30% / 50% 30% 70% 50%;
+    }
+    100% {
+        border-radius: 60% 40% 40% 60% / 60% 40% 60% 40%;
+    }
+}
+
+/* ==========================================================================
+   ПЛАВНОЕ ТЯЖЕЛОЕ КОЛЫХАНИЕ НА ВЕТРУ
+   ========================================================================== */
+@keyframes moveSilkOne {
+    0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+    50% { transform: translate(80px, 60px) rotate(30deg) scale(1.1); }
+    100% { transform: translate(-40px, 100px) rotate(-15deg) scale(0.95); }
+}
+
+@keyframes moveSilkTwo {
+    0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+    50% { transform: translate(-100px, -80px) rotate(-20deg) scale(1.05); }
+    100% { transform: translate(50px, -40px) rotate(45deg) scale(0.9); }
+}
+
+
+
+
+/* ==========================================================================
+   4. КАРТОЧКИ ОСОБЕННОСТЕЙ (FEATURES)
+   ========================================================================== */
+.features {
+    padding: 60px 8% 100px 8%;
+}
+
+.features h2 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 50px;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.feature-card {
+    background-color: rgba(19, 9, 36, 0.3);
+    padding: 40px 30px;
+    border-radius: 6px;
+    border: 1px solid rgba(138, 92, 246, 0.1);
+    transition: 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(138, 92, 246, 0.4);
+    box-shadow: 0 15px 30px rgba(5, 2, 10, 0.8);
+}
+
+.feature-card h3 {
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.feature-card p {
+    color: #94a3b8;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   5. ПОДВАЛ (FOOTER)
+   ========================================================================== */
+footer {
+    text-align: center;
+    padding: 40px;
+    border-top: 1px solid rgba(138, 92, 246, 0.1);
+    font-size: 13px;
+    font-weight: 600;
+    color: #4b5563;
+    letter-spacing: 1px;
+}
+
+/* ==========================================================================
+   6. АДАПТИВНОСТЬ
+   ========================================================================== */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        gap: 20px;
+        padding: 20px;
+    }
+    
+    nav a {
+        margin: 0 12px;
+        font-size: 13px;
+    }
+
+    .hero-content h1 {
+        font-size: 36px;
+    }
+
+    .btn-group {
+        flex-direction: column;
+        gap: 12px;
+    }
+}
+
+/* ==========================================================================
+   СТРАНИЦА ПРАВИЛ (RULES.HTML) — СТИЛИЗАЦИЯ
+   ========================================================================== */
+
+/* Контейнер страницы */
+.rules-container {
+    max-width: 900px;
+    margin: 60px auto 100px auto;
+    padding: 0 20px;
+}
+
+.rules-container h1 {
+    font-size: 36px;
+    font-weight: 900;
+    color: #fff;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+.accent-text {
+    color: #a855f7;
+    text-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+}
+
+.rules-subtitle {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 50px;
+}
+
+/* Категории правил (Спойлеры) */
+.rules-category {
+    background-color: rgba(19, 9, 36, 0.4);
+    border: 1px solid rgba(138, 92, 246, 0.15);
+    border-radius: 6px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    transition: 0.3s ease;
+}
+
+.rules-category:hover {
+    border-color: rgba(138, 92, 246, 0.4);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Кнопка-триггер для открытия спойлера */
+.category-trigger {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 20px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: left;
+    transition: 0.3s;
+}
+
+.category-trigger:hover {
+    background-color: rgba(138, 92, 246, 0.05);
+}
+
+/* Стрелочка */
+.category-trigger .arrow {
+    font-size: 12px;
+    color: #a855f7;
+    transition: transform 0.3s ease;
+}
+
+/* Анимация стрелочки при активации */
+.category-trigger.active {
+    background-color: rgba(138, 92, 246, 0.08);
+    color: #a855f7;
+}
+
+.category-trigger.active .arrow {
+    transform: rotate(180deg);
+    color: #fff;
+}
+
+/* Контент внутри спойлера */
+.category-content {
+    max-height: 0; 
+    overflow: hidden;
+    padding: 0 25px;
+    transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
+    background-color: rgba(5, 2, 10, 0.3);
+}
+
+/* Наш дизайнерский хак: добавляем невидимый отступ в самый конец контента */
+.category-content::after {
+    content: '';
+    display: block;
+    height: 15px; /* Этот блок создаст нужный воздух в самом низу плашки */
+}
+
+
+/* Отдельный пункт правила */
+.rule-item {
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(138, 92, 246, 0.1);
+}
+
+.rule-item:last-child {
+    border-bottom: none; /* Убираем нижнюю линию у последнего пункта */
+}
+
+.rule-item h3 {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 5px;
+    letter-spacing: 0.5px;
+}
+
+.rule-item p {
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Тег наказания */
+.punishment {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-left: 8px;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+
+
+/* Дополнительные стили для интерактивного редактора */
+.category-trigger-wrap {
+    display: flex;
+    align-items: center;
+    background: transparent;
+    width: 100%;
+}
+
+.btn-delete-cat {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0 20px;
+    transition: 0.2s;
+}
+.btn-delete-cat:hover { transform: scale(1.2); }
+
+.rule-item-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.btn-delete-item {
+    background: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    padding: 3px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    margin-top: 8px;
+    font-weight: 700;
+}
+.btn-delete-item:hover { background: rgba(239, 68, 68, 0.2); }
+
+/* Блок админки внизу */
+.admin-panel {
+    margin-top: 50px;
+    padding: 30px;
+    background-color: rgba(19, 9, 36, 0.8);
+    border: 2px dashed rgba(138, 92, 246, 0.4);
+    border-radius: 8px;
+}
+.admin-panel h3 { color: #fff; margin-bottom: 15px; text-transform: uppercase; font-size: 18px; }
+.admin-row { display: flex; gap: 15px; }
+.admin-row input, .add-rule-form input {
+    flex: 1;
+    background: rgba(5, 2, 10, 0.6);
+    border: 1px solid rgba(138, 92, 246, 0.3);
+    padding: 12px;
+    color: #fff;
+    border-radius: 4px;
+    font-family: 'Nunito', sans-serif;
+}
+.admin-row input:focus, .add-rule-form input:focus { outline: none; border-color: #a855f7; }
+
+/* Форма добавления пункта */
+.add-rule-form {
+    margin-top: 15px;
+    padding: 20px;
+    background: rgba(5, 2, 10, 0.4);
+    border-radius: 6px;
+    border: 1px solid rgba(138, 92, 246, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.add-rule-form h4 { color: #fff; font-size: 14px; text-transform: uppercase; margin-bottom: 5px; }
+
+
+
+/* ==========================================================================
+   СТРАНИЦА ПРОФЕССИЙ (JOBS.HTML) — СТИЛИЗАЦИЯ
+   ========================================================================== */
+
+/* Главный контейнер */
+.jobs-container {
+    max-width: 1200px;
+    margin: 60px auto 100px auto;
+    padding: 0 20px;
+}
+
+.jobs-container h1 {
+    font-size: 36px;
+    font-weight: 900;
+    color: #fff;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+.jobs-subtitle {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 40px;
+}
+
+/* Контейнер вкладок / Фильтров */
+.tabs-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 50px;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    background-color: rgba(19, 9, 36, 0.4);
+    border: 1px solid rgba(138, 92, 246, 0.2);
+    color: #94a3b8;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 4px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tab-btn:hover {
+    border-color: rgba(138, 92, 246, 0.6);
+    color: #fff;
+    background-color: rgba(138, 92, 246, 0.05);
+}
+
+.tab-btn.active {
+    background-color: #a855f7;
+    border-color: #a855f7;
+    color: #fff;
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+}
+
+/* Сетка карточек (Grid) */
+.jobs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 30px;
+}
+
+/* Сама карточка профессии */
+.job-card {
+    background-color: rgba(19, 9, 36, 0.4);
+    border: 1px solid rgba(138, 92, 246, 0.15);
+    border-radius: 8px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: 0.3s ease;
+}
+
+.job-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(138, 92, 246, 0.4);
+    box-shadow: 0 15px 30px rgba(5, 2, 10, 0.8);
+}
+
+/* Цвета бейджиков фракций */
+.job-badge {
+    position: absolute;
+    top: 25px;
+    right: 30px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    border-radius: 4px;
+}
+
+.citizen-badge {
+    background-color: rgba(34, 197, 94, 0.1);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.gov-badge {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.crime-badge {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Тексты внутри карточки */
+.job-card h3 {
+    color: #fff;
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 15px;
+    max-width: 60%; /* Чтобы текст не налезал на бейджик */
+}
+
+.job-desc {
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 25px;
+    flex-grow: 1; /* Прижимает блок характеристик к низу, если описания разной длины */
+}
+
+/* Статы (Зарплата и Оружие) */
+.job-stats {
+    border-top: 1px solid rgba(138, 92, 246, 0.1);
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.job-stats div {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+}
+
+.job-stats span {
+    color: #64748b;
+    font-weight: 700;
+}
+
+.job-stats strong {
+    color: #fff;
+    font-weight: 700;
+}
+
+/* Зеленый цвет для красивого выделения баксов в зарплате */
+.job-stats div:first-child strong {
+    color: #4ade80;
+}
+
+
+
+/* ==========================================================================
+   СТРАНИЦА ДОНАТА (DONATE.HTML) — СТИЛИЗАЦИЯ
+   ========================================================================== */
+
+.donate-container {
+    max-width: 1200px;
+    margin: 60px auto 100px auto;
+    padding: 0 20px;
+}
+
+.donate-container h1 {
+    font-size: 36px;
+    font-weight: 900;
+    color: #fff;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+.donate-subtitle {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 60px;
+}
+
+/* Сетка доната */
+.donate-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    align-items: flex-start;
+}
+
+/* Обычная карточка */
+.donate-card {
+    background-color: rgba(19, 9, 36, 0.4);
+    border: 1px solid rgba(138, 92, 246, 0.15);
+    border-radius: 8px;
+    padding: 40px 30px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: 0.3s ease;
+}
+
+/* Карточка PREMIUM (Выделенная) */
+.donate-card.featured {
+    border: 2px solid #a855f7;
+    box-shadow: 0 0 25px rgba(168, 85, 247, 0.25);
+    background-color: rgba(25, 12, 48, 0.5);
+    transform: scale(1.03); /* Немного увеличим для акцента */
+}
+
+@media (max-width: 992px) {
+    .donate-card.featured { transform: scale(1); } /* На мобилках убираем увеличение */
+}
+
+/* Бейджик "Популярно" */
+.popular-badge {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #a855f7, #6366f1);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 10px rgba(168, 85, 247, 0.4);
+}
+
+/* Хедер карточки */
+.donate-header {
+    text-align: center;
+    border-bottom: 1px solid rgba(138, 92, 246, 0.15);
+    padding-bottom: 25px;
+    margin-bottom: 25px;
+}
+
+.donate-header h3 {
+    color: #fff;
+    font-size: 24px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.price {
+    font-size: 36px;
+    font-weight: 900;
+    color: #fff;
+}
+
+.price span {
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 600;
+}
+
+/* Список преимуществ */
+.donate-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 35px;
+}
+
+.donate-features li {
+    font-size: 14px;
+    color: #94a3b8;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+/* Кнопка "Купить" внутри карточки */
+.donate-btn {
+    text-align: center;
+    width: 100%;
+    display: block;
+}
+
+
+
+
+/* ==========================================================================
+   СТРАНИЦА ЗАГЛУШКИ (MAINTENANCE.HTML) — СТИЛИЗАЦИЯ
+   ========================================================================== */
+
+/* Центрируем весь контент строго посередине экрана */
+.maintenance-wrapper {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    text-align: center;
+}
+
+.maintenance-content {
+    max-width: 600px;
+    background-color: rgba(19, 9, 36, 0.4);
+    border: 1px solid rgba(138, 92, 246, 0.2);
+    border-radius: 8px;
+    padding: 50px 40px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
+/* Анимация вращения шестеренки */
+.maintenance-icon {
+    font-size: 64px;
+    margin-bottom: 25px;
+    display: inline-block;
+}
+
+.gear-cog {
+    display: inline-block;
+    animation: rotate-gear 4s linear infinite;
+    text-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+}
+
+@keyframes rotate-gear {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.maintenance-content h1 {
+    font-size: 32px;
+    font-weight: 900;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+}
+
+.maintenance-text {
+    color: #94a3b8;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 35px;
+    line-height: 1.5;
+}
+
+/* Полоса прогресса в стиле загрузочного экрана */
+.progress-container {
+    background-color: rgba(5, 2, 10, 0.6);
+    border: 1px solid rgba(138, 92, 246, 0.15);
+    border-radius: 4px;
+    padding: 4px;
+    margin-bottom: 35px;
+}
+
+.progress-bar {
+    height: 6px;
+    background: linear-gradient(90deg, #a855f7, #6366f1);
+    border-radius: 2px;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+    animation: pulse-progress 2s infinite ease-in-out;
+    /* Наш дизайнерский штрих: делает увеличение полосы плавным */
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes pulse-progress {
+    0% { opacity: 0.7; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
+}
+
+.progress-status {
+    font-size: 11px;
+    color: #64748b;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 8px;
+    text-align: left;
+    padding-left: 5px;
+}
+
+.sub-text {
+    font-size: 13px;
+    color: #4b5563;
+    font-weight: 600;
+    margin-bottom: 25px;
+}
+
+.maintenance-links .btn {
+    display: inline-block;
+}
+
+/* Анимация эффекта взрыва/тряски при ошибке */
+@keyframes shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    100% { transform: translate(0px, 0px) rotate(0deg); }
+    10%, 30%, 50%, 70%, 90% { transform: translate(-5px, 2px) rotate(-1deg); }
+    20%, 40%, 60%, 80% { transform: translate(5px, -2px) rotate(1deg); }
+}
+
+
+
+
+/* ==========================================================================
+   СТРАНИЦА FAQ (FAQ.HTML) — СТИЛИЗАЦИЯ
+   ========================================================================== */
+.faq-container {
+    max-width: 900px;
+    margin: 60px auto 100px auto;
+    padding: 0 20px;
+}
+
+.faq-container h1 {
+    font-size: 36px;
+    font-weight: 900;
+    color: #fff;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+.faq-subtitle {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 50px;
+}
+
+
+
+
+/* ==========================================================================
+   СТРАНИЦА КОМАНДЫ (TEAM.HTML) — СТИЛИЗАЦИЯ
+   ========================================================================== */
+.team-container {
+    max-width: 1200px;
+    margin: 60px auto 100px auto;
+    padding: 0 20px;
+}
+
+.team-container h1 {
+    font-size: 36px;
+    font-weight: 900;
+    color: #fff;
+    text-transform: uppercase;
+    text-align: center;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+.team-subtitle {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 40px;
+}
+
+/* Сетка для команды */
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+/* Круглый контейнер для аватарки */
+.team-avatar-wrap {
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 20px 0; /* Прижимаем влево */
+    border-radius: 50%;
+    border: 2px solid rgba(138, 92, 246, 0.3);
+    overflow: hidden;
+    background-color: rgba(5, 2, 10, 0.4);
+}
+
+.team-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Цвета бейджиков рангов администрации */
+.rank-badge-creator {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.rank-badge-dev {
+    background-color: rgba(168, 85, 247, 0.15);
+    color: #c084fc;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.rank-badge-head {
+    background-color: rgba(234, 179, 8, 0.15);
+    color: #fde047;
+    border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+.rank-badge-admin {
+    background-color: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.rank-badge-mod {
+    background-color: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}

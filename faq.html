@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ — NOVA RP</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="logo">NOVA <span>RP</span></div>
+        <nav>
+            <a href="index.html">Главная</a>
+            <a href="rules.html">Правила</a>
+            <a href="jobs.html">Профессии</a>
+            <a href="donate.html">Донат</a>
+            <a href="team.html">Команда</a>
+            <a href="faq.html" class="active">FAQ</a>
+
+            <button class="btn-login" id="nav-login-btn" onclick="handleLoginClick()">Вход</button>
+        </nav>
+    </header>
+
+    <main class="faq-container">
+        <h1>Часто задаваемые вопросы</h1>
+        <p class="faq-subtitle">Возникли трудности? Здесь мы собрали ответы на самые популярные вопросы игроков.</p>
+
+        <!-- Кнопка включения режима админа -->
+        <div style="text-align: center; margin-bottom: 30px;">
+            <button class="btn btn-secondary" id="editor-toggle-btn" style="display: none;" onclick="toggleEditorPanel()">Режим редактора FAQ</button>
+        </div>
+
+        <!-- Контейнер для вопросов (управляется JS) -->
+        <div id="faq-app"></div>
+
+        <!-- Панель администратора -->
+        <div id="admin-panel" class="admin-panel" style="display: none;">
+            <h3>Добавить новый вопрос в FAQ</h3>
+            <div class="add-rule-form" style="background: transparent; padding: 0; border: none;">
+                <input type="text" id="new-faq-question" placeholder="Вопрос (например: Как начать играть?)">
+                <textarea id="new-faq-answer" placeholder="Ответ на вопрос..." style="width:100%; background:rgba(5,2,10,0.6); border:1px solid rgba(138,92,246,0.3); padding:12px; color:#fff; border-radius:4px; font-family:inherit; min-height:100px; margin: 10px 0; resize:vertical;"></textarea>
+                <button class="btn btn-primary" onclick="addFaqItem()">Добавить в список</button>
+            </div>
+            <div style="margin-top: 20px; text-align: center;">
+                <button class="btn btn-secondary" onclick="exportFaqHTML()">Экспортировать HTML для GitHub</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 NOVA RP. Все права защищены. Сервер не связан с Valve Corporation.</p>
+    </footer>
+
+    <script>
+        // Начальные вопросы по умолчанию
+        const defaultFaq = [
+            { q: "Как подключиться к серверу?", a: "Вы можете нажать кнопку 'Подключиться' на главной странице нашего сайта, либо скопировать IP-адрес и ввести в консоли игры Garry's Mod команду: connect ip_сервера." },
+            { q: "Где скачать контент сервера?", a: "Контент сервера скачивается автоматически при первом заведении. Если у вас видны эмо-текстуры (розово-черные квадраты) или ERROR-модели, убедитесь, что у вас установлен и смонтирован контент Counter-Strike: Source." }
+        ];
+
+        let faqData = JSON.parse(localStorage.getItem('nova_faq')) || defaultFaq;
+        let isAdmin = localStorage.getItem('nova_admin_session') === 'active';
+
+        function saveData() {
+            localStorage.setItem('nova_faq', JSON.stringify(faqData));
+            renderFaq();
+        }
+
+        let isPanelVisible = false;
+
+        function toggleEditorPanel() {
+            isPanelVisible = !isPanelVisible;
+            const adminPanel = document.getElementById('admin-panel');
+            const toggleBtn = document.getElementById('editor-toggle-btn');
+
+            if (adminPanel) adminPanel.style.display = isPanelVisible ? 'block' : 'none';
+            if (toggleBtn) toggleBtn.innerText = isPanelVisible ? "Скрыть панель редактора" : "Режим редактора FAQ";
+
+            isAdmin = isPanelVisible; 
+            renderFaq(); 
+        }
+
+        function renderFaq() {
+            const container = document.getElementById('faq-app');
+            container.innerHTML = '';
+
+            const isUserLogged = localStorage.getItem('nova_admin_session') === 'active';
+            const toggleBtn = document.getElementById('editor-toggle-btn');
+
+            if (toggleBtn) {
+                toggleBtn.style.display = isUserLogged ? 'inline-block' : 'none';
+            }
+
+            faqData.forEach((item, idx) => {
+                const faqDiv = document.createElement('div');
+                faqDiv.className = 'rules-category'; // Используем уже готовые стили плашек
+
+                const headerWrap = document.createElement('div');
+                headerWrap.className = 'category-trigger-wrap';
+
+                const triggerBtn = document.createElement('button');
+                triggerBtn.className = 'category-trigger';
+                triggerBtn.onclick = function() { toggleFaq(this); };
+                triggerBtn.innerHTML = `<span>❓ ${item.q}</span><span class="arrow">▼</span>`;
+                headerWrap.appendChild(triggerBtn);
+
+                if (isAdmin) {
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'btn-delete-cat';
+                    deleteBtn.innerText = '❌';
+                    deleteBtn.onclick = function() { deleteFaqItem(idx); };
+                    headerWrap.appendChild(deleteBtn);
+                }
+
+                faqDiv.appendChild(headerWrap);
+
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'category-content';
+                contentDiv.innerHTML = `<div class="rule-item" style="border:none;"><p style="font-size:15px; color:#c5c6c7;">${item.a}</p></div>`;
+
+                faqDiv.appendChild(contentDiv);
+                container.appendChild(faqDiv);
+            });
+        }
+
+        function toggleFaq(button) {
+            button.classList.toggle('active');
+            const content = button.closest('.rules-category').querySelector('.category-content');
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+            } else {
+                content.style.maxHeight = "500px";
+            }
+        }
+
+        function addFaqItem() {
+            const qInput = document.getElementById('new-faq-question');
+            const aInput = document.getElementById('new-faq-answer');
+            if (!qInput.value.trim() || !aInput.value.trim()) return alert("Заполните оба поля!");
+
+            faqData.push({ q: qInput.value, a: aInput.value });
+            qInput.value = '';
+            aInput.value = '';
+            saveData();
+        }
+
+        function deleteFaqItem(idx) {
+            if (confirm("Удалить этот вопрос?")) {
+                faqData.splice(idx, 1);
+                saveData();
+            }
+        }
+
+        function exportFaqHTML() {
+            let htmlOutput = `<!-- СКОПИРУЙТЕ И ЗАМЕНИТЕ БЛОК #FAQ-APP В ВАШЕМ FAQ.HTML -->\n<div id="faq-app">`;
+            faqData.forEach(item => {
+                htmlOutput += `\n  <div class="rules-category">
+    <button class="category-trigger" onclick="toggleFaq(this)">
+      <span>❓ ${item.q}</span>
+      <span class="arrow">▼</span>
+    </button>
+    <div class="category-content">
+      <div class="rule-item" style="border:none;">
+        <p style="font-size:15px; color:#c5c6c7;">${item.a}</p>
+      </div>
+    </div>
+  </div>`;
+            });
+            htmlOutput += `\n</div>`;
+            
+            navigator.clipboard.writeText(htmlOutput).then(() => {
+                alert("Готовый HTML-код FAQ скопирован!");
+            });
+        }
+
+        renderFaq();
+    </script>
+
+    <script src="auth-check.js"></script>
+
+</body>
+</html>

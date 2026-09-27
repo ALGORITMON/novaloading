@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Технические работы — NOVA RP</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="maintenance-wrapper">
+        <!-- Добавили id для смены стиля всей карточки при ошибке -->
+        <div class="maintenance-content" id="main-card">
+            
+            <div class="maintenance-icon">
+                <!-- Добавили id для остановки шестеренки -->
+                <div class="gear-cog" id="gear">⚙️</div>
+            </div>
+
+            <h1 id="maintenance-title">Технические работы</h1>
+            <p class="maintenance-text" id="maintenance-desc">В данный момент мы обновляем игровой server и сайт <span class="accent-text">NOVA RP</span>, чтобы сделать игру еще комфортнее.</p>
+
+            <div class="progress-container" id="p-container">
+                <div class="progress-bar" id="loading-bar" style="width: 0%;"></div>
+                <div class="progress-status" id="loading-status">Инициализация систем...</div>
+            </div>
+
+            <p class="sub-text" id="sub-info">Обычно это занимает не более часа. Следите за новостями проекта в нашем Discord!</p>
+
+            <div class="maintenance-links">
+                <a href="https://discord.gg" target="_blank" class="btn btn-primary" id="action-btn">Наш Discord</a>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const statusPhrases = [
+            "Подключение к базе данных MySQL...",
+            "Синхронизация таблиц доната...",
+            "Монтирование контента Counter-Strike: Source...",
+            "Оптимизация Lua-скриптов сервера...",
+            "Проверка целостности кэша пропов...",
+            "Очистка карты от брошенных автомобилей...",
+            "Загрузка кастомных скинов фракций...",
+            "Настройка прав администраторов (SAM/ULX)...",
+            "Сжатие сетевых пакетов...",
+            "Запуск игрового режима DarkRP...",
+            "Проверка соединения со Steam API..."
+        ];
+
+        const errorSpam = [
+            "ОШИБКА: lua/includes/modules/net.lua:83: bad argument...",
+            "WARNING: Connection to MySQL lost! Попытка восстановления...",
+            "CRITICAL ERROR: Prop Overflow! Слишком много маников на квадратный метр!",
+            "КРИТИЧЕСКИЙ СБОЙ СИСТЕМЫ!"
+        ];
+
+        let currentProgress = 0;
+        let isErrorTriggered = false;
+        const progressBar = document.getElementById('loading-bar');
+        const progressStatus = document.getElementById('loading-status');
+        const gear = document.getElementById('gear');
+        const mainCard = document.getElementById('main-card');
+        const mTitle = document.getElementById('maintenance-title');
+        const mDesc = document.getElementById('maintenance-desc');
+        const subInfo = document.getElementById('sub-info');
+        const actionBtn = document.getElementById('action-btn');
+
+        function simulateLoading() {
+            if (isErrorTriggered) return;
+
+            // Ломаем систему при достижении 92%
+            if (currentProgress >= 92) {
+                isErrorTriggered = true;
+                triggerCrashSequence();
+                return;
+            }
+
+            const step = Math.floor(Math.random() * 8) + 2;
+            currentProgress += step;
+            
+            if (currentProgress > 95) currentProgress = 95;
+            progressBar.style.width = currentProgress + "%";
+
+            if (Math.random() > 0.4) {
+                const randomIndex = Math.floor(Math.random() * statusPhrases.length);
+                progressStatus.innerText = statusPhrases[randomIndex];
+            }
+
+            const randomDelay = Math.floor(Math.random() * 700) + 300;
+            setTimeout(simulateLoading, randomDelay);
+        }
+
+        function triggerCrashSequence() {
+            let spamIndex = 0;
+            const spamInterval = setInterval(() => {
+                if (spamIndex < errorSpam.length) {
+                    progressStatus.innerText = errorSpam[spamIndex];
+                    progressStatus.style.color = "#f87171";
+                    spamIndex++;
+                } else {
+                    clearInterval(spamInterval);
+                    applyFinalCrashStyle();
+                }
+            }, 500);
+        }
+
+        function applyFinalCrashStyle() {
+            gear.style.animation = "none";
+            gear.innerText = "❌";
+            
+            progressBar.style.background = "#ef4444";
+            progressBar.style.boxShadow = "0 0 15px #ef4444";
+            
+            mTitle.innerText = "CONNECTION FAILED";
+            mTitle.style.color = "#ef4444";
+            mTitle.style.textShadow = "0 0 15px rgba(239, 68, 68, 0.5)";
+            
+            // ИСПРАВЛЕНО: заменили кавычки вокруг класса на одинарные, чтобы скрипт не ломался
+            mDesc.innerHTML = "Произошла критическая ошибка Lua при запуске ядра <span class='accent-text'>NOVA RP</span>. Администрация уже поднята по тревоге.";
+            progressStatus.innerText = "FATAL ERROR: Luadata corrupted. Запуск невозможен.";
+            
+            subInfo.innerText = "Мы уже чиним! Зайдите в Discord, чтобы узнать, когда сервер снова поднимется.";
+            actionBtn.innerText = "Наш дискордик";
+            actionBtn.style.background = "#ef4444";
+            actionBtn.style.color = "#fff";
+            actionBtn.style.boxShadow = "0 0 20px rgba(239, 68, 68, 0.4)";
+            
+            mainCard.style.animation = "shake 0.5s ease-in-out";
+            mainCard.style.borderColor = "rgba(239, 68, 68, 0.4)";
+        }
+
+        simulateLoading();
+    </script>
+
+</body>
+</html>

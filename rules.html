@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Правила сервера — NOVA RP</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="logo">NOVA <span>RP</span></div>
+        <nav>
+            <a href="index.html">Главная</a>
+            <a href="rules.html" class="active">Правила</a>
+            <a href="jobs.html">Профессии</a>
+            <a href="donate.html">Донат</a>
+            <a href="team.html">Команда</a>
+            <a href="faq.html">FAQ</a>
+
+            <button class="btn-login" id="nav-login-btn" onclick="handleLoginClick()">Вход</button>
+        </nav>
+    </header>
+
+    <main class="rules-container">
+        <h1>Свод правил сервера <span class="accent-text">NOVA RP</span></h1>
+        <p class="rules-subtitle">Незнание правил не освобождает от ответственности. Пожалуйста, ознакомьтесь с ними перед игрой.</p>
+
+        <div style="text-align: center; margin-bottom: 30px;">
+            <!-- Добавили id="editor-toggle-btn" и убрали изначальную видимость style="display:none;" -->
+            <button class="btn btn-secondary" id="editor-toggle-btn" style="display: none;" onclick="toggleEditorPanel()">Войти в режим редактора</button>
+        </div>
+
+        <!-- Контейнер, куда JS будет вставлять правила -->
+        <div id="rules-app"></div>
+
+        <!-- Панель добавления новых категорий (видима только админу) -->
+        <div id="admin-panel" class="admin-panel" style="display: none;">
+            <h3>Панель администратора</h3>
+            <div class="admin-row">
+                <input type="text" id="new-category-title" placeholder="Название новой категории (например: 4. Правила Госслужбы)">
+                <button class="btn btn-primary" onclick="addCategory()">Добавить категорию</button>
+            </div>
+            <div style="margin-top: 20px; text-align: center;">
+                <button class="btn btn-secondary" onclick="exportHTML()">Экспортировать готовый HTML для кода</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 NOVA RP. Все права защищены. Сервер не связан с Valve Corporation.</p>
+    </footer>
+
+    <!-- Логика работы интерактивного редактора -->
+    <!-- Исправленная логика работы интерактивного редактора -->
+    <script>
+        // Начальные правила по умолчанию
+        const defaultData = [
+            {
+                title: "1. Основные понятия (Термины DarkRP)",
+                items: [
+                    { title: "FreeKill / RDM (Random DeathMatch)", text: "Запрещено убийство или нанесение урона другим игрокам без видимой на то RP-причины.", punishment: "Jail / Ban" },
+                    { title: "FailRP", text: "Запрещено совершение действий, которые ваш персонаж не смог бы совершить в реальной жизни.", punishment: "Jail" }
+                ]
+            },
+            {
+                title: "2. Правила для криминальных структур",
+                items: [
+                    { title: "FearRP", text: "Вы обязаны отыгрывать страх за свою жизнь. Если на вас направили оружие, вы не имеете права доставать свой пистолет.", punishment: "Jail / Ban" }
+                ]
+            }
+        ];
+
+        let rulesData = JSON.parse(localStorage.getItem('nova_rules')) || defaultData;
+        let isAdmin = localStorage.getItem('nova_admin_session') === 'active';
+
+        function saveData() {
+            localStorage.setItem('nova_rules', JSON.stringify(rulesData));
+            renderRules();
+        }
+
+        // 1. Создаем переменную, которая отвечает за текущее состояние панели (открыта/закрыта)
+        let isPanelVisible = false;
+
+        // 2. Функция, которая срабатывает при клике на "Войти в режим редактора"
+        function toggleEditorPanel() {
+            isPanelVisible = !isPanelVisible; // Переключаем режим
+
+            const adminPanel = document.getElementById('admin-panel');
+            const toggleBtn = document.getElementById('editor-toggle-btn');
+
+            // Включаем или выключаем отображение формы добавления
+            if (adminPanel) {
+                adminPanel.style.display = isPanelVisible ? 'block' : 'none';
+            }
+
+            // Меняем текст на самой кнопке
+            if (toggleBtn) {
+                toggleBtn.innerText = isPanelVisible ? "Скрыть панель редактора" : "Войти в режим редактора";
+            }
+
+            // Меняем isAdmin, чтобы при отрисовке появились или исчезли крестики удаления пунктов
+            isAdmin = isPanelVisible; 
+            renderRules(); // Перерисовываем правила, чтобы обновить крестики
+        }
+
+        // 3. Изменяем логику в самом начале функции renderRules()
+        function renderRules() {
+            const container = document.getElementById('rules-app');
+            container.innerHTML = '';
+
+            // Проверяем, залогинен ли админ в системе вообще
+            const isUserLogged = localStorage.getItem('nova_admin_session') === 'active';
+            const toggleBtn = document.getElementById('editor-toggle-btn');
+
+            if (toggleBtn) {
+                // Если в систему вошли — показываем саму кнопку "Войти в режим редактора"
+                toggleBtn.style.display = isUserLogged ? 'inline-block' : 'none';
+            }
+
+            rulesData.forEach((category, cIdx) => {
+                const catDiv = document.createElement('div');
+                catDiv.className = 'rules-category';
+
+                // Создаем обертку для шапки аккордеона
+                const headerWrap = document.createElement('div');
+                headerWrap.className = 'category-trigger-wrap';
+
+                // Создаем кнопку открытия спойлера
+                const triggerBtn = document.createElement('button');
+                triggerBtn.className = 'category-trigger';
+                triggerBtn.onclick = function() { toggleCategory(this); };
+                triggerBtn.innerHTML = `<span>${category.title}</span><span class="arrow">▼</span>`;
+                headerWrap.appendChild(triggerBtn);
+
+                // Если админ — создаем кнопку удаления категории через прямой обработчик событий
+                if (isAdmin) {
+                    const deleteCatBtn = document.createElement('button');
+                    deleteCatBtn.className = 'btn-delete-cat';
+                    deleteCatBtn.innerText = '❌';
+                    deleteCatBtn.onclick = function() { deleteCategory(cIdx); };
+                    headerWrap.appendChild(deleteCatBtn);
+                }
+
+                catDiv.appendChild(headerWrap);
+
+                // Создаем контейнер для контента правил
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'category-content';
+
+                // Отрисовываем пункты правил
+                category.items.forEach((item, iIdx) => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'rule-item';
+                    
+                    const punishmentTag = item.punishment ? `<span class="punishment">${item.punishment}</span>` : '';
+                    
+                    itemDiv.innerHTML = `
+                        <div class="rule-item-header">
+                            <h3>${item.title}</h3>
+                            ${punishmentTag}
+                        </div>
+                        <p>${item.text}</p>
+                    `;
+
+                    // Если админ — добавляем кнопку удаления пункта с прямой привязкой индексов
+                    if (isAdmin) {
+                        const deleteItemBtn = document.createElement('button');
+                        deleteItemBtn.className = 'btn-delete-item';
+                        deleteItemBtn.innerText = 'Удалить пункт';
+                        deleteItemBtn.onclick = function() { deleteItem(cIdx, iIdx); };
+                        itemDiv.appendChild(deleteItemBtn);
+                    }
+
+                    contentDiv.appendChild(itemDiv);
+                });
+
+                // Если админ — добавляем форму создания правила прямо внутрь категории
+                if (isAdmin) {
+                    const addForm = document.createElement('div');
+                    addForm.className = 'add-rule-form';
+                    addForm.innerHTML = `
+                        <h4>Добавить правило в эту секцию:</h4>
+                        <input type="text" id="title-${cIdx}" placeholder="Название правила (н-р: NLR)">
+                        <input type="text" id="text-${cIdx}" placeholder="Описание правила">
+                        <input type="text" id="punish-${cIdx}" placeholder="Наказание (н-р: Jail 15 мин)">
+                    `;
+
+                    const addBtn = document.createElement('button');
+                    addBtn.className = 'btn btn-primary';
+                    addBtn.style.padding = '6px 15px';
+                    addBtn.style.fontSize = '12px';
+                    addBtn.innerText = 'Добавить';
+                    addBtn.onclick = function() { addItem(cIdx); };
+                    
+                    addForm.appendChild(addBtn);
+                    contentDiv.appendChild(addForm);
+                }
+
+                catDiv.appendChild(contentDiv);
+                container.appendChild(catDiv);
+            });
+        }
+
+        function toggleCategory(button) {
+            button.classList.toggle('active');
+            const content = button.closest('.rules-category').querySelector('.category-content');
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+            } else {
+                content.style.maxHeight = "2000px"; 
+            }
+        }
+
+        function addCategory() {
+            const titleInput = document.getElementById('new-category-title');
+            if (!titleInput.value.trim()) return;
+            rulesData.push({ title: titleInput.value, items: [] });
+            titleInput.value = '';
+            saveData();
+        }
+
+        function deleteCategory(cIdx) {
+            if (confirm("Удалить всю эту категорию вместе с правилами?")) {
+                rulesData.splice(cIdx, 1);
+                saveData();
+            }
+        }
+
+        function addItem(cIdx) {
+            const t = document.getElementById(`title-${cIdx}`).value;
+            const txt = document.getElementById(`text-${cIdx}`).value;
+            const p = document.getElementById(`punish-${cIdx}`).value;
+
+            if (!t.trim() || !txt.trim()) return alert("Заполните название и описание!");
+
+            rulesData[cIdx].items.push({ title: t, text: txt, punishment: p });
+            saveData();
+        }
+
+        function deleteItem(cIdx, iIdx) {
+            rulesData[cIdx].items.splice(iIdx, 1);
+            saveData();
+        }
+
+        // Пофиксили генерацию чистого HTML для экспорта на GitHub
+        function exportHTML() {
+            let htmlOutput = `<!-- СКОПИРУЙТЕ ЭТОТ БЛОК И ВСТАВЬТЕ В СВОЙ RULES.HTML ВЗАМЕН СТАРОГО RULES-APP -->\n<div id="rules-app">`;
+            
+            rulesData.forEach(category => {
+                htmlOutput += `\n  <div class="rules-category">
+                <button class="category-trigger" onclick="toggleCategory(this)">
+                  <span>${category.title}</span>
+                  <span class="arrow">▼</span>
+                </button>
+                <div class="category-content">`;
+                
+                category.items.forEach(item => {
+                    const pTag = item.punishment ? ` <span class="punishment">${item.punishment}</span>` : '';
+                    htmlOutput += `\n      <div class="rule-item">
+                <div class="rule-item-header">
+                  <h3>${item.title}</h3>${pTag}
+                </div>
+                <p>${item.text}</p>
+              </div>`;
+                });
+                
+                htmlOutput += `\n    </div>\n  </div>`;
+            });
+            htmlOutput += `\n</div>`;
+            
+            navigator.clipboard.writeText(htmlOutput).then(() => {
+                alert("Готовый чистый HTML-код правил скопирован в буфер обмена!");
+            });
+        }
+
+        renderRules();
+    </script>
+
+    <script src="auth-check.js"></script>
+
+</body>
+</html>

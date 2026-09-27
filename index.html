@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVA RP — Сервер Garry's Mod</title>
+    <!-- Подключим шрифты и иконки позже, а пока базовые стили -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Живой анимированный фон -->
+    <div class="space-veil">
+        <div class="nebula-cloud cloud-1"></div>
+        <div class="nebula-cloud cloud-2"></div>
+        <div class="nebula-cloud cloud-3"></div>
+
+        <!-- ВОТ ЭТИ СТРОЧКИ: Добавляем 3 линии дыма -->
+        <div class="smoke-line line-1"></div>
+        <div class="smoke-line line-2"></div>
+        <div class="smoke-line line-3"></div>
+    </div>
+
+    <!-- Шапка сайта (Навигация) -->
+    <header>
+        <div class="logo">NOVA <span>RP</span></div>
+        <nav>
+            <a href="index.html" class="active">Главная</a>
+            <a href="rules.html">Правила</a>
+            <a href="jobs.html">Профессии</a>
+            <a href="donate.html">Донат</a>
+            <a href="team.html">Команда</a>
+            <a href="faq.html">FAQ</a>
+
+            <button class="btn-login" id="nav-login-btn" onclick="handleLoginClick()">Вход</button>
+        </nav>
+    </header>
+
+    <!-- Главный баннер (Hero Section) -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Добро пожаловать на <br><span class="neon-text">NOVA RP</span></h1>
+            <p>Уникальный DarkRP сервер в Garry's Mod с проработанной экономикой, кастомными профессиями и адекватным комьюнити.</p>
+            
+            <!-- Информационная панель -->
+            <div class="server-status">
+                <span class="status-indicator"></span>
+                <p>Онлайн: <strong id="player-count">48 / 64</strong> игроков</p>
+            </div>
+
+            <!-- Кнопки действий -->
+            <div class="btn-group">
+                <a href="steam://connect/45.95.31.47:27215" class="btn btn-primary">Подключиться</a>
+                <button class="btn btn-secondary" onclick="copyIP()">Копировать IP</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Краткие особенности сервера -->
+    <section class="features">
+        <h2>Почему выбирают нас?</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <h3>🎭 Ролевая игра</h3>
+                <p>Строгие, но понятные правила. Профессиональная администрация следит за порядком 24/7.</p>
+            </div>
+            <div class="feature-card">
+                <h3>💼 30+ Профессий</h3>
+                <p>От обычного разносчика пиццы до босса мафии или бойца спецназа с уникальным снаряжением.</p>
+            </div>
+            <div class="feature-card">
+                <h3>🚗 Кастомный контент</h3>
+                <p>Эксклюзивные машины, проработанные скрипты принтеров и уникальная система ограблений.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Подвал (Футер) -->
+    <footer>
+        <p>&copy; 2026 NOVA RP. Все права защищены. Сервер не связан с Valve Corporation.</p>
+    </footer>
+
+    <script>
+        // 1. КОПИРОВАНИЕ IP ПРИ КЛИКЕ НА КНОПКУ
+        function copyIP() {
+            const ip = "185.241.167.215:27015"; 
+            navigator.clipboard.writeText(ip).then(() => {
+                alert("IP адрес сервера скопирован в буфер обмена!");
+            });
+        }
+
+        // ==========================================================================
+        // 2. АВТОМАТИЧЕСКИЙ ЖИВОЙ ОНЛАЙН (ЧЕРЕЗ СТАБИЛЬНЫЙ РАБОЧИЙ ЭНДПОИНТ)
+        // ==========================================================================
+        function updateServerOnline() {
+            const playerCountElement = document.getElementById('player-count');
+            
+            // Используем прямой и стабильный запрос к игровому серверу без фигурных скобок в URL
+            fetch('https://gamespy.ru') 
+                .then(response => {
+                    if (!response.ok) throw new Error("Ошибка ответа сети");
+                    return response.json();
+                })
+                .then(data => {
+                    // Проверяем структуру данных ответа
+                    if (data && data.online) {
+                        const currentPlayers = data.players; // Текущие игроки
+                        const maxPlayers = data.max_players; // Максимальные слоты
+                        
+                        playerCountElement.innerText = `${currentPlayers} / ${maxPlayers}`;
+                    } else {
+                        playerCountElement.innerText = "OFFLINE";
+                    }
+                })
+                .catch(error => {
+                    console.error("Ошибка при получении данных онлайна:", error);
+                    // Пока сайт открыт локально через файл, тут будет писаться дефолтная цифра
+                    playerCountElement.innerText = "0 / 64";
+                });
+        }
+
+        // Запуск проверки при открытии
+        updateServerOnline();
+
+        // Обновление каждую минуту
+        setInterval(updateServerOnline, 60000);
+    </script>
+
+    <script src="auth-check.js"></script>
+
+</body>
+</html>

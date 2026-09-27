@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Команда проекта — NOVA RP</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Наша стабильная шапка сайта -->
+    <header>
+        <div class="logo">NOVA <span>RP</span></div>
+        <nav>
+            <a href="index.html">Главная</a>
+            <a href="rules.html">Правила</a>
+            <a href="jobs.html">Профессии</a>
+            <a href="donate.html">Донат</a>
+            <a href="team.html" class="active">Команда</a>
+            <a href="faq.html">FAQ</a>
+
+            <button class="btn-login" id="nav-login-btn" onclick="handleLoginClick()">Вход</button>
+        </nav>
+    </header>
+
+    <main class="team-container">
+        <h1>Команда проекта <span class="accent-text">NOVA RP</span></h1>
+        <p class="team-subtitle">Они следят за порядком на сервере, пишут код и помогают игрокам 24/7.</p>
+
+        <!-- Кнопка включения режима админа -->
+        <div style="text-align: center; margin-bottom: 40px;">
+            <button class="btn btn-secondary" id="editor-toggle-btn" style="display: none;" onclick="toggleEditorPanel()">Режим редактора Команды</button>
+        </div>
+
+        <!-- Сетка карточек администрации (управляется JS) -->
+        <div class="team-grid" id="team-app"></div>
+
+        <!-- Панель администратора для добавления нового члена команды -->
+        <div id="admin-panel" class="admin-panel" style="display: none;">
+            <h3>Добавить администратора / модератора</h3>
+            <div class="add-rule-form" style="background: transparent; padding: 0; border: none;">
+                <input type="text" id="admin-nick" placeholder="Никнейм (например: John_Doe)">
+                
+                <!-- Выбор ранга для красивого цвета бейджика -->
+                <select id="admin-rank" style="width:100%; background:rgba(5,2,10,0.6); border:1px solid rgba(138,92,246,0.3); padding:12px; color:#fff; border-radius:4px; font-family:inherit; margin-bottom: 10px;">
+                    <option value="creator">Создатель проекта</option>
+                    <option value="dev">Разработчик</option>
+                    <option value="head">Гл. Администратор</option>
+                    <option value="admin">Администратор</option>
+                    <option value="mod">Модератор</option>
+                </select>
+
+                <input type="text" id="admin-avatar" placeholder="Ссылка на аватарку (или оставь пустым для стандартной)">
+                <input type="text" id="admin-discord" placeholder="Discord для связи (например: john_doe#0000)">
+                <input type="text" id="admin-desc" placeholder="Краткое описание (например: Отвечает за порядок, банит читеров)">
+                
+                <button class="btn btn-primary" onclick="addTeamMember()">Добавить в команду</button>
+            </div>
+            <div style="margin-top: 20px; text-align: center;">
+                <button class="btn btn-secondary" onclick="exportTeamHTML()">Экспортировать HTML для GitHub</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 NOVA RP. Все права защищены. Сервер не связан with Valve Corporation.</p>
+    </footer>
+
+    <script>
+        // Начальный состав по умолчанию
+        const defaultTeam = [
+            {
+                nick: "Основатель NOVA",
+                rank: "creator",
+                avatar: "https://dicebear.com", // Крутой робот-заглушка вместо аватарки
+                discord: "nova_owner",
+                desc: "Главный создатель и идейный вдохновитель сервера. Занимается глобальным развитием."
+            },
+            {
+                nick: "Спец.Админ Алекс",
+                rank: "head",
+                avatar: "https://dicebear.com",
+                discord: "alex_admin",
+                desc: "Следит за работой персонала, разбирает спорные ситуации и жалобы игроков."
+            }
+        ];
+
+        let teamData = JSON.parse(localStorage.getItem('nova_team')) || defaultTeam;
+        let isAdmin = localStorage.getItem('nova_admin_session') === 'active';
+
+        // Перевод рангов для вывода текста
+        const rankLabels = {
+            creator: "Создатель",
+            dev: "Разработчик",
+            head: "Гл. Администратор",
+            admin: "Администратор",
+            mod: "Модератор"
+        };
+
+        function saveData() {
+            localStorage.setItem('nova_team', JSON.stringify(teamData));
+            renderTeam();
+        }
+
+        let isPanelVisible = false;
+
+        function toggleEditorPanel() {
+            isPanelVisible = !isPanelVisible;
+            const adminPanel = document.getElementById('admin-panel');
+            const toggleBtn = document.getElementById('editor-toggle-btn');
+
+            if (adminPanel) adminPanel.style.display = isPanelVisible ? 'block' : 'none';
+            if (toggleBtn) toggleBtn.innerText = isPanelVisible ? "Скрыть панель редактора" : "Режим редактора Команды";
+
+            isAdmin = isPanelVisible; 
+            renderTeam(); 
+        }
+
+        function renderTeam() {
+            const container = document.getElementById('team-app');
+            container.innerHTML = '';
+
+            const isUserLogged = localStorage.getItem('nova_admin_session') === 'active';
+            const toggleBtn = document.getElementById('editor-toggle-btn');
+
+            if (toggleBtn) {
+                toggleBtn.style.display = isUserLogged ? 'inline-block' : 'none';
+            }
+
+            teamData.forEach((member, idx) => {
+                const card = document.createElement('div');
+                card.className = `job-card team-card`; // Переиспользуем стили карточек
+
+                // Определяем дефолтную аватарку, если поле пустое
+                const avatarUrl = member.avatar.trim() || `https://dicebear.com{member.nick}`;
+
+                card.innerHTML = `
+                    <div class="job-badge rank-badge-${member.rank}">${rankLabels[member.rank] || "Персонал"}</div>
+                    <div class="team-avatar-wrap">
+                        <img src="${avatarUrl}" alt="${member.nick}" class="team-avatar">
+                    </div>
+                    <h3>${member.nick}</h3>
+                    <p class="job-desc" style="margin-bottom: 15px;">${member.desc}</p>
+                    <div class="job-stats" style="margin-top: auto; padding-top: 15px;">
+                        <div><span>Discord:</span> <strong style="color: #6366f1;">${member.discord}</strong></div>
+                    </div>
+                `;
+
+                if (isAdmin) {
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'btn-delete-item';
+                    deleteBtn.style.width = '100%';
+                    deleteBtn.style.marginTop = '15px';
+                    deleteBtn.innerText = 'Удалить члена команды';
+                    deleteBtn.onclick = function() { deleteMember(idx); };
+                    card.appendChild(deleteBtn);
+                }
+
+                container.appendChild(card);
+            });
+        }
+
+        function addTeamMember() {
+            const nick = document.getElementById('admin-nick').value;
+            const rank = document.getElementById('admin-rank').value;
+            const avatar = document.getElementById('admin-avatar').value;
+            const discord = document.getElementById('admin-discord').value;
+            const desc = document.getElementById('admin-desc').value;
+
+            if (!nick.trim() || !discord.trim()) return alert("Заполните хотя бы никнейм и Discord!");
+
+            teamData.push({ nick, rank, avatar, discord, desc: desc || "Участник команды сервера NOVA RP." });
+            
+            // Очистка полей
+            document.getElementById('admin-nick').value = '';
+            document.getElementById('admin-avatar').value = '';
+            document.getElementById('admin-discord').value = '';
+            document.getElementById('admin-desc').value = '';
+            
+            saveData();
+        }
+
+        function deleteMember(idx) {
+            if (confirm("Удалить этого участника из списка команды?")) {
+                teamData.splice(idx, 1);
+                saveData();
+            }
+        }
+
+        function exportTeamHTML() {
+            let htmlOutput = `<!-- СКОПИРУЙТЕ И ЗАМЕНИТЕ БЛОК #TEAM-APP В ВАШЕМ TEAM.HTML -->\n<div class="team-grid" id="team-app">`;
+            
+            teamData.forEach(member => {
+                const avatarUrl = member.avatar.trim() || `https://dicebear.com{member.nick}`;
+                htmlOutput += `\n  <div class="job-card team-card">
+    <div class="job-badge rank-badge-${member.rank}">${rankLabels[member.rank]}</div>
+    <div class="team-avatar-wrap">
+      <img src="${avatarUrl}" alt="${member.nick}" class="team-avatar">
+    </div>
+    <h3>${member.nick}</h3>
+    <p class="job-desc" style="margin-bottom: 15px;">${member.desc}</p>
+    <div class="job-stats" style="margin-top: auto; padding-top: 15px;">
+      <div><span>Discord:</span> <strong style="color: #6366f1;">${member.discord}</strong></div>
+    </div>
+  </div>`;
+            });
+            htmlOutput += `\n</div>`;
+            
+            navigator.clipboard.writeText(htmlOutput).then(() => {
+                alert("HTML-код сетки команды скопирован!");
+            });
+        }
+
+        renderTeam();
+    </script>
+
+    <script src="auth-check.js"></script>
+
+</body>
+</html>
