@@ -321,8 +321,7 @@
         const pass = document.getElementById('password').value;
 
         // Запускаем шифрование и ждем результат
-        getSHA256(pass).then(hashedPassword => {
-            console.log("РЕАЛЬНЫЙ ХЭШ:", hashedPassword); 
+        getSHA256(pass).then(hashedPassword => { 
             
             const targetHash = "90ba9328b1e19a02ecfdf82a609a4c01a24402a570b761cbd7ccda2351d08e91";
 
