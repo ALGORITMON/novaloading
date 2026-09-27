@@ -165,7 +165,7 @@
                 </div>
 
                 <!-- ИСПРАВЛЕНО: тип кнопки изменен на обычный button, а функция вызывается через onclick -->
-                <button type="button" class="btn-submit" onclick="await submitLogin()">Войти в аккаунт</button>
+                <button type="button" class="btn-submit" onclick="submitLogin()">Войти в аккаунт</button>
             </form>
 
             <div class="login-footer">
@@ -306,30 +306,24 @@
 
 </style>
 
-    <!-- Подключаем надежную библиотеку криптографии SHA-256 -->
-    <script src="https://cloudflare.com"></script>
-
-    <!-- Никаких внешних библиотек! Используем встроенное в браузер шифрование -->
     <script>
-        // Функция, которая превращает пароль в хэш с помощью встроенных инструментов браузера
-        async function submitLogin() {
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
+    // Внутренняя функция шифрования
+    async function getSHA256(text) {
+        const msgBuffer = new TextEncoder().encode(text);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
 
-            // Кодируем текст пароля в байты
-            const msgBuffer = new TextEncoder().encode(pass);
-            
-            // Хэшируем встроенным в браузер методом SHA-256
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-            
-            // Превращаем результат в читаемую строку из букв и цифр
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            const hashedPassword = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    // Обычная функция для кнопки, которая сама вызывает шифрование
+    function submitLogin() {
+        const user = document.getElementById('username').value;
+        const pass = document.getElementById('password').value;
 
-            // Твой зашифрованный хэш от пароля "NOVA_ADMIN_2026"
+        // Запускаем шифрование и ждем результат
+        getSHA256(pass).then(hashedPassword => {
             const targetHash = "4bf59f77fecfb883adfa8916327b7f168018bf0a65bc5c30fbdb730be78c3c43";
 
-            // Сравниваем логин и хэши
             if (user === "admin" && hashedPassword === targetHash) {
                 localStorage.setItem('nova_admin_session', 'active');
                 alert("Успешный вход! Доступ к управлению сайтом разрешен.");
@@ -337,11 +331,14 @@
             } else {
                 alert("Неверный логин или пароль!");
             }
-        }
-    </script>
+        }).catch(err => {
+            console.error("Ошибка шифрования:", err);
+            alert("Произошла ошибка при обработке пароля.");
+        });
+    }
+</script>
 
-    <!-- Твой внешний скрипт проверки сессии -->
-    <script src="auth-check.js"></script>
+<script src="auth-check.js"></script>
 
 </body>
 </html>
