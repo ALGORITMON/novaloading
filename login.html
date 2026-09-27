@@ -324,7 +324,7 @@
         getSHA256(pass).then(hashedPassword => {
             console.log("РЕАЛЬНЫЙ ХЭШ:", hashedPassword); 
             
-            const targetHash = "4bf59f77fecfb883adfa8916327b7f168018bf0a65bc5c30fbdb730be78c3c43";
+            const targetHash = "90ba9328b1e19a02ecfdf82a609a4c01a24402a570b761cbd7ccda2351d08e91";
 
             if (user === "admin" && hashedPassword === targetHash) {
                 localStorage.setItem('nova_admin_session', 'active');
