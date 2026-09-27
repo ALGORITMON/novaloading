@@ -322,6 +322,8 @@
 
         // Запускаем шифрование и ждем результат
         getSHA256(pass).then(hashedPassword => {
+            console.log("РЕАЛЬНЫЙ ХЭШ:", hashedPassword); 
+            
             const targetHash = "4bf59f77fecfb883adfa8916327b7f168018bf0a65bc5c30fbdb730be78c3c43";
 
             if (user === "admin" && hashedPassword === targetHash) {
