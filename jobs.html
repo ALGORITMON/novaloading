@@ -3,107 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Профессии сервера — NOVA RP</title>
-
-<link rel="preconnect" href="https://googleapis.com">
-<link rel="preconnect" href="https://gstatic.com" crossorigin>
-<link href="https://googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="style.css">
+    <title>NovaRP — Вакансии</title>
+    <style>
+        :root {
+            --bg-color: #141414;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --text-muted: #8a8a8a;
+            --border-color: #2a2a2a;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            font-weight: 700;
+            margin-bottom: 40px;
+            color: #fff;
+        }
+        .category-block {
+            margin-bottom: 40px;
+        }
+        .category-title {
+            font-size: 22px;
+            font-weight: 600;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+            letter-spacing: 0.5px;
+        }
+        .jobs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+        .job-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-left-width: 6px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .job-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .job-salary {
+            background-color: #1b5e20;
+            color: #a5d6a7;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .job-desc {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-line;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+        .job-footer {
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid var(--border-color);
+            padding-top: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .job-footer strong {
+            color: #aaa;
+        }
+        .status-msg {
+            text-align: center;
+            font-size: 16px;
+            color: var(--text-muted);
+            margin-top: 40px;
+        }
+    </style>
 </head>
 <body>
 
-    <!-- Шапка сайта (active переносим на Профессии) -->
-    <header>
-        <div class="logo">NOVA <span>RP</span></div>
-        <nav>
-            <a href="index.html">Главная</a>
-            <a href="rules.html">Правила</a>
-            <a href="jobs.html" class="active">Профессии</a>
-            <a href="donate.html">Донат</a>
-            <a href="team.html">Команда</a>
-            <a href="faq.html">FAQ</a>
+<div class="container">
+    <h1>Список профессий NovaRP</h1>
+    <div id="status" class="status-msg">Загрузка актуального списка вакансий...</div>
+    <div id="jobs-container"></div>
+</div>
 
-            <button class="btn-login" id="nav-login-btn" onclick="handleLoginClick()">Вход</button>
-        </nav>
-    </header>
-
-    <main class="jobs-container">
-        <h1>Профессии сервера <span class="accent-text">NOVA RP</span></h1>
-        <p class="jobs-subtitle">Выберите свою роль в жизни города. Каждая профессия имеет уникальные возможности.</p>
-
-        <!-- Вкладки (Фильтры фракций) -->
-        <div class="tabs-container">
-            <button class="tab-btn active" onclick="filterJobs('all')">Все</button>
-            <button class="tab-btn" onclick="filterJobs('citizens')">Гражданские</button>
-            <button class="tab-btn" onclick="filterJobs('government')">Гос. структуры</button>
-            <button class="tab-btn" onclick="filterJobs('gangsters')">Криминал</button>
-        </div>
-
-        <!-- Сетка карточек с профессиями -->
-        <div class="jobs-grid">
-            
-            <!-- Пример 1: Гражданский -->
-            <div class="job-card" data-category="citizens">
-                <div class="job-badge citizen-badge">Гражданский</div>
-                <h3>Гражданин</h3>
-                <p class="job-desc">Обычный житель города. Может строить дома, открывать легальный бизнес или просто работать на обычных работах.</p>
-                <div class="job-stats">
-                    <div><span>Зарплата:</span> <strong>$45</strong></div>
-                    <div><span>Оружие:</span> <strong>Кулаки</strong></div>
-                </div>
-            </div>
-
-            <!-- Пример 2: Гос. структура -->
-            <div class="job-card" data-category="government">
-                <div class="job-badge gov-badge">Полиция</div>
-                <h3>Офицер полиции</h3>
-                <p class="job-desc">Следит за порядком на улицах города. Имеет право арестовывать преступников, обыскивать подозрительных граждан и выдавать лицензии.</p>
-                <div class="job-stats">
-                    <div><span>Зарплата:</span> <strong>$150</strong></div>
-                    <div><span>Оружие:</span> <strong>Glock-18, Дубинка, Наручники</strong></div>
-                </div>
-            </div>
-
-            <!-- Пример 3: Криминал -->
-            <div class="job-card" data-category="gangsters">
-                <div class="job-badge crime-badge">Криминал</div>
-                <h3>Гангстер</h3>
-                <p class="job-desc">Член местной уличной группировки. Занимается мелкими грабежами, рэкетом торговцев и подчиняется Боссу мафии.</p>
-                <div class="job-stats">
-                    <div><span>Зарплата:</span> <strong>$30</strong></div>
-                    <div><span>Оружие:</span> <strong>Нож, Обойма отмычек</strong></div>
-                </div>
-            </div>
-
-        </div>
-    </main>
-
-    <footer>
-        <p>&copy; 2026 NOVA RP. Все права защищены. Сервер не связан с Valve Corporation.</p>
-    </footer>
-
-    <!-- Скрипт для фильтрации карточек по вкладкам -->
-    <script>
-        function filterJobs(category) {
-            // Переключаем активный класс у кнопок
-            const buttons = document.querySelectorAll('.tab-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-
-            // Фильтруем карточки
-            const cards = document.querySelectorAll('.job-card');
-            cards.forEach(card => {
-                if (category === 'all' || card.getAttribute('data-category') === category) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
-    </script>
-
-    <script src="auth-check.js"></script>
+<script>
+    // Относительный путь к файлу в вашем репозитории
+    const LUA_FILE_URL = './data/jobs.lua'; 
     
+    // Базовая зарплата сервера (если в Lua указано GAMEMODE.Config.normalsalary)
+    const BASE_NORMAL_SALARY = 45; 
+
+    async function init() {
+        const statusEl = document.getElementById('status');
+        try {
+            const response = await fetch(LUA_FILE_URL);
+            if (!response.ok) throw new Error('Файл jobs.lua не найден в папке data/');
+            
+            const luaText = await response.text();
+            const jobs = parseDarkRPJobs(luaText);
+            
+            if (jobs.length === 0) {
+                statusEl.innerText = 'Профессии не найдены или файл пуст.';
+                return;
+            }
+            
+            statusEl.style.display = 'none';
+            renderDarkRPJobs(jobs);
+        } catch (err) {
+            statusEl.innerText = 'Ошибка загрузки данных: ' + err.message;
+            console.error(err);
+        }
+    }
+
+    function parseDarkRPJobs(text) {
+        const jobs = [];
+        // Регулярное выражение для поиска блоков DarkRP.createJob
+        const jobRegex = /DarkRP\.createJob\s*\(\s*"([^"]+)"\s*,\s*\{([\s\S]*?)\}\s*\)/g;
+        let match;
+
+        while ((match = jobRegex.exec(text)) !== null) {
+            const name = match[1];
+            const body = match[2];
+
+            const category = extractField(body, 'category') || 'Разное';
+            const description = extractField(body, 'description') || 'Описание отсутствует.';
+            const max = extractField(body, 'max') || '0';
+            
+            // Расчет зарплаты
+            let salary = extractField(body, 'salary') || '0';
+            if (salary.includes('GAMEMODE.Config.normalsalary')) {
+                const multMatch = salary.match(/\*\s*([\d.]+)/);
+                const multiplier = multMatch ? parseFloat(multMatch[1]) : 1;
+                salary = Math.round(BASE_NORMAL_SALARY * multiplier) + ' \$';
+            } else {
+                salary = salary + ' \$';
+            }
+
+            // Парсинг цвета Color(R, G, B)
+            const colorMatch = body.match(/Color\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+            const color = colorMatch ? `rgb(${colorMatch[1]}, ${colorMatch[2]}, ${colorMatch[3]})` : '#ffffff';
+
+            jobs.push({ name, category, description, max, salary, color });
+        }
+        return jobs;
+    }
+
+    function extractField(body, fieldName) {
+        const regex = new RegExp(`${fieldName}\\s*=\\s*([\\s\\S]*?)(?:,|\\n|\\})`);
+        const match = body.match(regex);
+        if (!match) return null;
+        
+        let val = match[1].trim();
+        
+        // Очищаем многострочные кавычки Lua [[ ]]
+        if (val.startsWith('[[')) {
+            val = val.replace(/^\[\[/, '').replace(/\]\]\$/, '');
+        }
+        // Очищаем обычные кавычки " " или ' '
+        val = val.replace(/^["']/, '').replace(/["']\$/, '');
+        // Убираем возможные Lua комментарии в конце строки
+        val = val.split('--')[0].trim();
+        
+        return val;
+    }
+
+    function renderDarkRPJobs(jobs) {
+        const container = document.getElementById('jobs-container');
+        
+        // Сортируем вакансии по категориям
+        const groups = {};
+        jobs.forEach(job => {
+            if (!groups[job.category]) groups[job.category] = [];
+            groups[job.category].push(job);
+        });
+
+        // Генерируем HTML блоки
+        for (const category in groups) {
+            const block = document.createElement('div');
+            block.className = 'category-block';
+            
+            const title = document.createElement('div');
+            title.className = 'category-title';
+            title.innerText = category;
+            block.appendChild(title);
+
+            const grid = document.createElement('div');
+            grid.className = 'jobs-grid';
+
+            groups[category].forEach(job => {
+                const limitText = job.max === '0' ? 'Без лимита' : `${job.max} чел.`;
+                const card = document.createElement('div');
+                card.className = 'job-card';
+                card.style.borderLeftColor = job.color;
+
+                card.innerHTML = `
+                    <div>
+                        <div class="job-header">
+                            <div class="job-name">${job.name}</div>
+                            <div class="job-salary">${job.salary}</div>
+                        </div>
+                        <div class="job-desc">${job.description}</div>
+                    </div>
+                    <div class="job-footer">
+                        <span>Свободных мест:</span>
+                        <strong>${limitText}</strong>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            block.appendChild(grid);
+            container.appendChild(block);
+        }
+    }
+
+    init();
+</script>
 </body>
 </html>
