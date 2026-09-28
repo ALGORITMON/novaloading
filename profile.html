@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет — NOVA RP</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cloudflare.com">
+    <style>
+        /* Стили игрового личного кабинета */
+        .profile-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+            min-height: calc(100vh - 200px);
+        }
+
+        @media (max-width: 900px) {
+            .profile-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Боковая панель ЛК */
+        .profile-sidebar {
+            background: #1c1f26;
+            border-radius: 10px;
+            padding: 25px;
+            border: 1px solid #2d3446;
+            height: fit-content;
+            text-align: center;
+        }
+
+        .avatar-block {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 15px;
+            background: #2d3446;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: #3b82f6;
+            border: 3px solid #3b82f6;
+        }
+
+        .user-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .user-sid {
+            font-size: 12px;
+            color: #8a8a8a;
+            background: #13151c;
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 25px;
+        }
+
+        .lk-nav {
+            list-style: none;
+            text-align: left;
+        }
+
+        .lk-nav li {
+            margin-bottom: 10px;
+        }
+
+        .lk-nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #9aa5b5;
+            text-decoration: none;
+            padding: 12px 15px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+
+        .lk-nav a:hover, .lk-nav a.active {
+            background: #232834;
+            color: #fff;
+        }
+
+        .lk-nav a.active {
+            border-left: 4px solid #3b82f6;
+        }
+
+        /* Главная зона контента */
+        .profile-content {
+            background: #1c1f26;
+            border-radius: 10px;
+            padding: 30px;
+            border: 1px solid #2d3446;
+        }
+
+        .section-title {
+            font-size: 22px;
+            color: #fff;
+            margin-bottom: 25px;
+            font-weight: 700;
+            border-bottom: 1px solid #2d3446;
+            padding-bottom: 10px;
+        }
+
+        /* Виджеты статистики */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .stat-box {
+            background: #232834;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #2d3446;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .stat-icon.money { background: rgba(74, 222, 128, 0.1); color: #4ade80; }
+        .stat-icon.donate { background: rgba(250, 204, 21, 0.1); color: #facc15; }
+        .stat-icon.time { background: rgba(168, 85, 247, 0.1); color: #a855f7; }
+
+        .stat-info p {
+            font-size: 13px;
+            color: #8a8a8a;
+            margin: 0;
+        }
+
+        .stat-info h3 {
+            font-size: 20px;
+            color: #fff;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Шапка сайта -->
+    <header>
+        <div class="logo">NOVA <span>RP</span></div>
+        <nav>
+            <a href="index.html">Главная</a>
+            <a href="rules.html">Правила</a>
+            <a href="jobs.html">Профессии</a>
+            <a href="donate.html">Донат</a>
+            <a href="team.html">Команда</a>
+            <a href="faq.html">FAQ</a>
+
+            <button class="btn-login active" id="nav-login-btn" onclick="location.href='profile.html'">Кабинет</button>
+        </nav>
+    </header>
+
+    <div class="profile-container">
+        
+        <!-- Сайдбар -->
+        <aside class="profile-sidebar">
+            <div class="avatar-block">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+            <div class="user-name" id="username-display">Загрузка...</div>
+            <div class="user-sid" id="steamid-display">STEAM_0:0:00000000</div>
+
+            <ul class="lk-nav">
+                <li><a href="#" class="active" onclick="switchTab('main')"><i class="fa-solid fa-gauge"></i> Общая информация</a></li>
+                <li><a href="#" onclick="switchTab('settings')"><i class="fa-solid fa-sliders"></i> Настройки аккаунта</a></li>
+                <li><a href="#" style="color: #ef4444;" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Выйти из аккаунта</a></li>
+            </ul>
+        </aside>
+
+        <!-- Основное окно информации -->
+        <main class="profile-content" id="tab-main">
+            <h2 class="section-title">Игровая статистика</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-icon money"><i class="fa-solid fa-wallet"></i></div>
+                    <div class="stat-info">
+                        <p>Наличные</p>
+                        <h3 id="money-display">$0</h3>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-icon donate"><i class="fa-solid fa-coins"></i></div>
+                    <div class="stat-info">
+                        <p>Донат-баланс</p>
+                        <h3 id="rub-display">0 ₽</h3>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-icon time"><i class="fa-solid fa-clock"></i></div>
+                    <div class="stat-info">
+                        <p>Время в игре</p>
+                        <h3 id="time-display">0 ч.</h3>
+                    </div>
+                </div>
+            </div>
+            <h2 class="section-title">Дополнительные данные</h2>
+            <div style="background: #232834; padding: 20px; border-radius: 8px; border: 1px solid #2d3446;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px;">
+                    <span style="color: #8a8a8a;">Текущая профессия:</span>
+                    <strong style="color: #4ade80;" id="job-display">Гражданин</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px;">
+                    <span style="color: #8a8a8a;">Группа прав (Ранг):</span>
+                    <strong style="color: #3b82f6;" id="rank-display">Player</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 15px;">
+                    <span style="color: #8a8a8a;">Предупреждения (Варны):</span>
+                    <strong style="color: #ef4444;" id="warns-display">0 / 3</strong>
+                </div>
+            </div>
+        </main>
+
+        <!-- Окно настроек (скрыто по умолчанию) -->
+        <main class="profile-content" id="tab-settings" style="display: none;">
+            <h2 class="section-title">Настройки аккаунта</h2>
+            
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <!-- Привязка соцсетей -->
+                <div style="background: #232834; padding: 20px; border-radius: 8px; border: 1px solid #2d3446;">
+                    <h3 style="color: #fff; font-size: 16px; margin-bottom: 15px;"><i class="fa-brands fa-telegram" style="color:#24a1de;"></i> Привязка Telegram</h3>
+                    <p style="color: #8a8a8a; font-size: 14px; margin-bottom: 15px;">Привяжите Telegram-бота, чтобы получать уведомления о входе в аккаунт и защитить свой профиль.</p>
+                    <button style="background: #24a1de; color: #fff; border: none; padding: 10px 20px; border-radius: 50px; font-weight: 600; cursor: pointer;">Подключить Telegram</button>
+                </div>
+
+                <!-- Смена пароля -->
+                <div style="background: #232834; padding: 20px; border-radius: 8px; border: 1px solid #2d3446;">
+                    <h3 style="color: #fff; font-size: 16px; margin-bottom: 15px;"><i class="fa-solid fa-key"></i> Промокод</h3>
+                    <p style="color: #8a8a8a; font-size: 14px; margin-bottom: 15px;">Вводите бонусные промокоды от администрации для получения игровой валюты.</p>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" placeholder="Введите промокод" style="background: #13151c; border: 1px solid #2d3446; padding: 10px 15px; border-radius: 6px; color: #fff; flex-grow: 1;">
+                        <button style="background: #3b82f6; color: #fff; border: none; padding: 10px 25px; border-radius: 6px; font-weight: 600; cursor: pointer;">Активировать</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+    </div>
+
+    <footer>
+        <p>&copy; 2026 NOVA RP. Все права защищены. Сервер не связан с Valve Corporation.</p>
+    </footer>
+
+    <!-- Скрипт логики Личного Кабинета -->
+    <script>
+        // Функция переключения вкладок в ЛК
+        function switchTab(tabName) {
+            // Скрываем все блоки контента ЛК
+            document.getElementById('tab-main').style.display = 'none';
+            document.getElementById('tab-settings').style.display = 'none';
+
+            // Убираем активный класс со всех ссылок в меню
+            const navLinks = document.querySelectorAll('.lk-nav a');
+            navLinks.forEach(link => link.classList.remove('active'));
+
+            // Показываем нужный блок и делаем кликнутую ссылку активной
+            document.getElementById(`tab-${tabName}`).style.display = 'block';
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add('active');
+            }
+        }
+
+        // Заполнение ЛК данными (Имитация или чтение из сессии авторизации)
+        function initProfile() {
+            // Демо-данные для визуализации (позже заменяются на ответ от вашего API)
+            const demoUser = {
+                username: "Alexander_Gromov",
+                steamid: "STEAM_0:1:439582104",
+                money: 452900,
+                donate: 150,
+                playtime: 42,
+                job: "Мафиози",
+                rank: "VIP",
+                warns: "0 / 3"
+            };
+
+            // Выводим данные на экран
+            document.getElementById('username-display').innerText = demoUser.username;
+            document.getElementById('steamid-display').innerText = demoUser.steamid;
+            document.getElementById('money-display').innerText = `$${demoUser.money.toLocaleString()}`;
+            document.getElementById('rub-display').innerText = `${demoUser.donate} ₽`;
+            document.getElementById('time-display').innerText = `${demoUser.playtime} ч.`;
+            document.getElementById('job-display').innerText = demoUser.job;
+            document.getElementById('rank-display').innerText = demoUser.rank;
+            document.getElementById('warns-display').innerText = demoUser.warns;
+        }
+
+        // Кнопка выхода
+        function logout() {
+            if (confirm("Вы действительно хотите выйти из Личного Кабинета?")) {
+                // Здесь будет логика очистки токенов авторизации
+                alert("Вы вышли из аккаунта. Перенаправление на главную страницу.");
+                window.location.href = "index.html";
+            }
+        }
+
+        // Запуск при загрузке страницы
+        window.addEventListener('DOMContentLoaded', initProfile);
+    </script>
+</body>
+</html>
