@@ -6,19 +6,46 @@
     <title>Профессии сервера — NOVA RP</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Дополнительные динамические стили для интеграции с Lua */
+        /* Оптимизированные стили под единый список профессий */
         .job-card {
             border-top: 4px solid #3b82f6;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            background-color: #1c1f26; /* Темный фон карточки под стиль Garry's Mod */
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s;
+        }
+        .job-card:hover {
+            transform: translateY(-2px);
+        }
+        .job-card h3 {
+            margin-top: 0;
+            margin-bottom: 12px;
+            font-size: 20px;
+            color: #fff;
+        }
+        .job-desc {
+            color: #9aa5b5;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+        .job-stats {
+            border-top: 1px solid #2d3446;
+            padding-top: 15px;
         }
         .job-stats div {
-            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 14px;
         }
         .job-stats span {
             color: #8a8a8a;
-            font-size: 14px;
         }
         .job-stats strong {
             color: #fff;
@@ -53,42 +80,19 @@
         <h1>Профессии сервера <span class="accent-text">NOVA RP</span></h1>
         <p class="jobs-subtitle">Выберите свою роль в жизни города. Каждая профессия имеет уникальные возможности.</p>
 
-        <!-- Вкладки (Фильтры фракций) -->
-        <div class="tabs-container">
-            <button class="tab-btn active" data-filter="all" onclick="filterJobs('all')">Все</button>
-            <button class="tab-btn" data-filter="citizens" onclick="filterJobs('citizens')">Гражданские</button>
-            <button class="tab-btn" data-filter="government" onclick="filterJobs('government')">Гос. структуры</button>
-            <button class="tab-btn" data-filter="gangsters" onclick="filterJobs('gangsters')">Криминал</button>
-        </div>
-
-        <!-- Сетка карточек с профессиями -->
+        <!-- Сетка карточек с профессиями без фильтрации -->
         <div class="jobs-grid" id="dynamic-jobs-grid">
-            <div id="jobs-status" class="status-loading">Загрузка и парсинг конфигурации профессий...</div>
+            <div id="jobs-status" class="status-loading">Загрузка актуального списка вакансий...</div>
         </div>
     </main>
     <footer>
         <p>&copy; 2026 NOVA RP. Все права защищены. Сервер не связан с Valve Corporation.</p>
     </footer>
 
-    <!-- Скрипт автоматического парсинга и фильтрации -->
+    <!-- Скрипт автоматического парсинга без фильтров -->
     <script>
         const LUA_FILE_URL = './data/jobs.lua'; // Относительный путь к вашему файлу на GitHub
         const BASE_NORMAL_SALARY = 45;         // Базовая зарплата из настроек игрового мода
-
-        // Маппинг категорий DarkRP в ваши вкладки-фильтры
-        const CATEGORY_MAP = {
-            'Администрация': 'citizens',   // Администраторы отображаются во вкладке "Все" или при желании в "Гражданские"
-            'Граждане': 'citizens',
-            'Гражданская защита': 'government',
-            'Гангстеры': 'gangsters'
-        };
-
-        // Текстовые плашки для карточек
-        const BADGE_MAP = {
-            'citizens': { text: 'Гражданский', class: 'citizen-badge' },
-            'government': { text: 'Полиция', class: 'gov-badge' },
-            'gangsters': { text: 'Криминал', class: 'crime-badge' }
-        };
 
         async function loadLuaJobs() {
             const statusEl = document.getElementById('jobs-status');
@@ -109,12 +113,12 @@
                 statusEl.style.display = 'none';
                 renderCards(jobs, gridEl);
             } catch (err) {
-                statusEl.innerHTML = `<span style="color:#ef4444;">Ошибка: ${err.message}</span>`;
+                statusEl.innerHTML = `<span style="color:#ef4444;">Ошибка загрузки: ${err.message}</span>`;
                 console.error(err);
             }
         }
 
-                function parseLua(text) {
+        function parseLua(text) {
             const jobs = [];
             const jobRegex = /DarkRP\.createJob\s*\(\s*"([^"]+)"\s*,\s*\{([\s\S]*?)\}\s*\)/g;
             let match;
@@ -123,19 +127,9 @@
                 const name = match[1];
                 const body = match[2];
 
-                // Исправленный поиск категории с поддержкой любых кавычек и пробелов
-                const luaCategory = extractLuaField(body, 'category') || 'Граждане';
-                const description = extractLuaField(body, 'description') || 'Описание отсутствует.';
-                
-                // Проверяем точное соответствие категорий
-                let filterTab = 'citizens';
-                if (luaCategory === 'Гражданская защита') {
-                    filterTab = 'government';
-                } else if (luaCategory === 'Гангстеры') {
-                    filterTab = 'gangsters';
-                } else if (luaCategory === 'Администрация') {
-                    filterTab = 'citizens'; // По вашему желанию можно выводить в гражданских или сделать отдельную вкладку
-                }
+                // Безопасное извлечение описания с очисткой от квадратных скобок Lua [[ ]]
+                let description = extractLuaField(body, 'description') || 'Описание отсутствует.';
+                description = description.replace(/^\[\[\s*/, '').replace(/\s*\]\]\$/, '').trim();
 
                 // Вычисление зарплаты
                 let salary = extractLuaField(body, 'salary') || '0';
@@ -144,10 +138,10 @@
                     const multiplier = multMatch ? parseFloat(multMatch[1]) : 1;
                     salary = `$${Math.round(BASE_NORMAL_SALARY * multiplier)}`;
                 } else {
-                    salary = `$${salary}`;
+                    salary = `$${salary.replace(/["']/g, '').trim()}`;
                 }
 
-                // Парсинг доступного оружия (исправленный сбор массивов строк)
+                // Парсинг доступного оружия
                 let weaponsText = 'Кулаки';
                 const weaponsMatch = body.match(/weapons\s*=\s*\{([\s\S]*?)\}/);
                 if (weaponsMatch && weaponsMatch[1].trim() !== '') {
@@ -161,55 +155,34 @@
                     }
                 }
 
-                // Парсинг цвета верхней рамки
+                // Парсинг цвета верхней рамки карточки
                 const colorMatch = body.match(/Color\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
                 const color = colorMatch ? `rgb(${colorMatch[1]}, ${colorMatch[2]}, ${colorMatch[3]})` : '#3b82f6';
 
-                jobs.push({ name, filterTab, description, salary, weaponsText, color });
+                jobs.push({ name, description, salary, weaponsText, color });
             }
             return jobs;
         }
 
         function extractLuaField(body, fieldName) {
-            // Регулярное выражение корректно захватывает текст между кавычками "...", '...' или [[...]]
-            const regex = new RegExp(`${fieldName}\\s*=\\s*(?:\\[\\[([\\s\\S]*?)\\]\\]|["']([^"']*)["']|([\\w\\d\\.\\*\\s]+))`);
+            const regex = new RegExp(`${fieldName}\\s*=\\s*(?:\\[\\[([\\s\\S]*?)\\]\\]|["']([^"']*)["']|([\\w\\d\\.\\*\\s_-]+))`);
             const match = body.match(regex);
             if (!match) return null;
 
-            // Возвращаем ту группу, которая сработала при совпадении кавычек
             let val = (match[1] || match[2] || match[3] || '').trim();
-            
-            // Если внутри строки остались комментарии DarkRP, отрезаем их
             if (val.includes('--')) {
                 val = val.split('--')[0].trim();
             }
-
-            return val;
-        }
-
-        function extractLuaField(body, fieldName) {
-            const regex = new RegExp(`${fieldName}\\s*=\\s*([\\s\\S]*?)(?:,|\\n|\\})`);
-            const match = body.match(regex);
-            if (!match) return null;
-
-            let val = match[1].trim();
-            if (val.startsWith('[[')) val = val.replace(/^\[\[/, '').replace(/\]\]\$/, '');
-            val = val.replace(/^["']/, '').replace(/["']\$/, '');
-            val = val.split('--')[0].trim();
-
             return val;
         }
 
         function renderCards(jobs, container) {
             jobs.forEach(job => {
-                const badgeInfo = BADGE_MAP[job.filterTab] || { text: 'Житель', class: 'citizen-badge' };
                 const card = document.createElement('div');
                 card.className = 'job-card';
-                card.setAttribute('data-category', job.filterTab);
                 card.style.borderTopColor = job.color;
 
                 card.innerHTML = `
-                    <div class="job-badge ${badgeInfo.class}">${badgeInfo.text}</div>
                     <h3>${job.name}</h3>
                     <p class="job-desc">${job.description}</p>
                     <div class="job-stats">
@@ -221,26 +194,7 @@
             });
         }
 
-        // Классическая функция фильтрации для ваших вкладок
-        function filterJobs(category) {
-            const buttons = document.querySelectorAll('.tab-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            
-            if (event && event.target) {
-                event.target.classList.add('active');
-            }
-
-            const cards = document.querySelectorAll('.job-card');
-            cards.forEach(card => {
-                if (category === 'all' || card.getAttribute('data-category') === category) {
-                    card.style.display = 'flex'; // flex для правильного прижатия stats вниз
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
-
-        // Инициализация при загрузке страницы
+        // Запуск при полной готовности DOM
         window.addEventListener('DOMContentLoaded', loadLuaJobs);
     </script>
 
