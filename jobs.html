@@ -114,7 +114,7 @@
             }
         }
 
-        function parseLua(text) {
+                function parseLua(text) {
             const jobs = [];
             const jobRegex = /DarkRP\.createJob\s*\(\s*"([^"]+)"\s*,\s*\{([\s\S]*?)\}\s*\)/g;
             let match;
@@ -123,11 +123,19 @@
                 const name = match[1];
                 const body = match[2];
 
+                // Исправленный поиск категории с поддержкой любых кавычек и пробелов
                 const luaCategory = extractLuaField(body, 'category') || 'Граждане';
                 const description = extractLuaField(body, 'description') || 'Описание отсутствует.';
                 
-                // Фильтрация вкладки
-                const filterTab = CATEGORY_MAP[luaCategory] || 'citizens';
+                // Проверяем точное соответствие категорий
+                let filterTab = 'citizens';
+                if (luaCategory === 'Гражданская защита') {
+                    filterTab = 'government';
+                } else if (luaCategory === 'Гангстеры') {
+                    filterTab = 'gangsters';
+                } else if (luaCategory === 'Администрация') {
+                    filterTab = 'citizens'; // По вашему желанию можно выводить в гражданских или сделать отдельную вкладку
+                }
 
                 // Вычисление зарплаты
                 let salary = extractLuaField(body, 'salary') || '0';
@@ -139,7 +147,7 @@
                     salary = `$${salary}`;
                 }
 
-                // Парсинг доступного оружия
+                // Парсинг доступного оружия (исправленный сбор массивов строк)
                 let weaponsText = 'Кулаки';
                 const weaponsMatch = body.match(/weapons\s*=\s*\{([\s\S]*?)\}/);
                 if (weaponsMatch && weaponsMatch[1].trim() !== '') {
@@ -147,7 +155,7 @@
                         .replace(/["']/g, '')
                         .split(',')
                         .map(w => w.trim())
-                        .filter(w => w.length > 0);
+                        .filter(w => w.length > 0 && !w.startsWith('--'));
                     if (weaponsArray.length > 0) {
                         weaponsText = weaponsArray.join(', ');
                     }
@@ -160,6 +168,23 @@
                 jobs.push({ name, filterTab, description, salary, weaponsText, color });
             }
             return jobs;
+        }
+
+        function extractLuaField(body, fieldName) {
+            // Регулярное выражение корректно захватывает текст между кавычками "...", '...' или [[...]]
+            const regex = new RegExp(`${fieldName}\\s*=\\s*(?:\\[\\[([\\s\\S]*?)\\]\\]|["']([^"']*)["']|([\\w\\d\\.\\*\\s]+))`);
+            const match = body.match(regex);
+            if (!match) return null;
+
+            // Возвращаем ту группу, которая сработала при совпадении кавычек
+            let val = (match[1] || match[2] || match[3] || '').trim();
+            
+            // Если внутри строки остались комментарии DarkRP, отрезаем их
+            if (val.includes('--')) {
+                val = val.split('--')[0].trim();
+            }
+
+            return val;
         }
 
         function extractLuaField(body, fieldName) {
