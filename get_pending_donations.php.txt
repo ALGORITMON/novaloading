@@ -1,0 +1,68 @@
+<?php
+// ==========================================================================
+// API ОБРАБОТЧИК ДЛЯ ВЫДАЧИ ДОНАТА НА СЕРВЕР NOVA RP
+// ==========================================================================
+
+header('Content-Type: application/json; charset=utf-8');
+
+// 1. Безопасность: Проверяем секретный ключ, который прислал сервер Garry's Mod
+$server_key = $_POST['key'] ?? '';
+$expected_key = "ваш_секретный_ключ_сервера_123"; // Должен совпадать с ключом из Lua-скрипта
+
+if (empty($server_key) || $server_key !== $expected_key) {
+    http_response_code(430);
+    echo json_encode(["success" => false, "error" => "Неверный ключ доступа сервера"]);
+    exit;
+}
+
+// 2. Подключение к вашей базе данных (Данные из панели хостинга)
+$db_host = '95.213.255.80';         // Сюда вписали ХОСТ
+$db_user = 'u4574_HeKqXEr5jZ';       // Сюда вписали ПОЛЬЗОВАТЕЛЬ
+$db_pass = 'ВАШ_ПАРОЛЬ_ИЗ_ГЛАЗИКА';  // Нажмите на "глазик" в панели и вставьте пароль сюда
+$db_name = 's4574_DONATE';          // Сюда вписали ИМЯ БАЗЫ
+
+$conn = new mysqli($db_host, $db_user, $db_pass, $db_name);
+
+if ($conn->connect_error) {
+    http_response_code(500);
+    echo json_encode(["success" => false, "error" => "Ошибка подключения к БД"]);
+    exit;
+}
+
+// 3. Если сервер GMod сообщает, что успешно выдал товар, помечаем заказ выполненным
+$delivered_order_id = $_POST['mark_delivered_id'] ?? '';
+if (!empty($delivered_order_id)) {
+    $stmt = $conn->prepare("UPDATE orders SET status = 'delivered' WHERE id = ?");
+    $stmt->bind_param("i", $delivered_order_id);
+    $stmt->execute();
+    
+    echo json_encode(["success" => true, "message" => "Заказ #$delivered_order_id помечен как выданный"]);
+    $stmt->close();
+    $conn->close();
+    exit;
+}
+
+// 4. Иначе: отдаем серверу список всех оплаченных, но еще не выданных товаров
+$sql = "SELECT id, steamid, item_id, quantity FROM orders WHERE status = 'paid'";
+$result = $conn->query($sql);
+
+$orders = [];
+if ($result && $result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
+        $orders[] = [
+            "id" => (int)$row['id'],
+            "steamid" => $row['steamid'],
+            "item_id" => $row['item_id'],
+            "quantity" => (int)$row['quantity']
+        ];
+    }
+}
+
+// Отправляем JSON ответ обратно в Garry's Mod
+echo json_encode([
+    "success" => true,
+    "orders" => $orders
+]);
+
+$conn->close();
+?>

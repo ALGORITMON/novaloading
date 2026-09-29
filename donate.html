@@ -3,17 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Донат — NOVA RP</title>
-
-<link rel="preconnect" href="https://googleapis.com">
-<link rel="preconnect" href="https://gstatic.com" crossorigin>
-<link href="https://googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-
+    <title>Магазин доната — NOVA RP</title>
+    <!-- Подключаем ваш файл стилей -->
     <link rel="stylesheet" href="style.css">
+    <!-- Подключаем иконки FontAwesome (они нужны для карточек) -->
+    <link rel="stylesheet" href="https://cloudflare.com">
+    
+    <!-- Стили исключительно для новой корзины -->
+    <style>
+        .tabs-container { margin-bottom: 40px; }
+        
+        /* Модальное окно корзины (выезжает справа) */
+        .cart-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(5, 2, 10, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            justify-content: flex-end;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .cart-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        .cart-sidebar {
+            width: 100%; max-width: 420px; height: 100vh;
+            background: #130924;
+            border-left: 1px solid rgba(138, 92, 246, 0.3);
+            padding: 30px;
+            display: flex; flex-direction: column;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+        }
+        .cart-overlay.active .cart-sidebar { transform: translateX(0); }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(138, 92, 246, 0.15); padding-bottom: 20px; margin-bottom: 20px; }
+        .cart-items-list { flex: 1; overflow-y: auto; margin-bottom: 20px; }
+        
+        .cart-item-row { display: flex; justify-content: space-between; align-items: center; background: rgba(5, 2, 10, 0.4); border: 1px solid rgba(138, 92, 246, 0.1); padding: 15px; border-radius: 6px; margin-bottom: 12px; }
+        .cart-item-qty { display: flex; align-items: center; background: rgba(19, 9, 36, 0.6); border: 1px solid rgba(138, 92, 246, 0.2); border-radius: 4px; }
+        .cart-item-qty button { background: transparent; border: none; color: #fff; padding: 5px 10px; cursor: pointer; font-weight: bold; }
+        .cart-item-qty span { padding: 0 5px; font-weight: bold; }
+        
+        .cart-footer { border-top: 1px solid rgba(138, 92, 246, 0.15); padding-top: 20px; }
+        .steam-input { width: 100%; background: rgba(5, 2, 10, 0.6); border: 1px solid rgba(138, 92, 246, 0.3); padding: 12px; color: #fff; border-radius: 4px; margin-bottom: 15px; outline: none; }
+        .steam-input:focus { border-color: #a855f7; }
+        .cart-total { display: flex; justify-content: space-between; font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 15px; }
+        
+        #cart-count { background: #ef4444; color: white; font-size: 11px; padding: 2px 7px; border-radius: 10px; margin-left: 5px; }
+        .btn-trash { background: transparent; border: none; color: #4b5563; cursor: pointer; margin-left: 10px; transition: color 0.2s; }
+        .btn-trash:hover { color: #f87171; }
+    </style>
 </head>
 <body>
 
-    <!-- Шапка сайта (active переносим на Донат) -->
+    <!-- Живая атласная вуаль из вашего дизайна -->
+    <div class="space-veil">
+        <div class="nebula-cloud cloud-1"></div>
+        <div class="nebula-cloud cloud-2"></div>
+    </div>
+
+    <!-- Шапка сайта -->
     <header>
         <div class="logo">NOVA <span>RP</span></div>
         <nav>
@@ -23,73 +76,293 @@
             <a href="donate.html" class="active">Донат</a>
             <a href="team.html">Команда</a>
             <a href="faq.html">FAQ</a>
-
-            <button class="btn-login" id="nav-login-btn" onclick="handleLoginClick()">Вход</button>
+            <button class="btn-login" id="auth-btn">Вход</button>
         </nav>
     </header>
 
-    <main class="donate-container">
-        <h1>Привилегии сервера <span class="accent-text">NOVA RP</span></h1>
-        <p class="donate-subtitle">Поддержите проект и получите уникальные игровые возможности, кастомные скины и права.</p>
-
-        <!-- Сетка тарифных планов -->
-        <div class="donate-grid">
-            
-            <!-- Тариф 1: VIP -->
-            <div class="donate-card">
-                <div class="donate-header">
-                    <h3>VIP статус</h3>
-                    <div class="price">199 <span>₽ / мес</span></div>
-                </div>
-                <ul class="donate-features">
-                    <li>🟢 Уникальный префикс [VIP] в чате</li>
-                    <li>🟢 Доступ к 5+ эксклюзивным профессиям</li>
-                    <li>🟢 +25% к ежеминутной зарплате</li>
-                    <li>🟢 Лимит пропов увеличен до 50</li>
-                </ul>
-                <a href="#" class="btn btn-secondary donate-btn">Купить</a>
-            </div>
-
-            <!-- Тариф 2: PREMIUM (Популярный — с неоновым выделением) -->
-            <div class="donate-card featured">
-                <div class="popular-badge">Популярно</div>
-                <div class="donate-header">
-                    <h3>PREMIUM</h3>
-                    <div class="price">399 <span>₽ / мес</span></div>
-                </div>
-                <ul class="donate-features">
-                    <li>🟣 Все возможности VIP-статуса</li>
-                    <li>🟣 Префикс [PREMIUM] золотым цветом</li>
-                    <li>🟣 Доступ ко ВСЕМ скрытым профессиям</li>
-                    <li>🟣 Своя точка спавна и кастомный хитмаркер</li>
-                    <li>🟣 Иммунитет к кику за АФК</li>
-                </ul>
-                <a href="#" class="btn btn-primary donate-btn">Купить</a>
-            </div>
-
-            <!-- Тариф 3: ADMIN -->
-            <div class="donate-card">
-                <div class="donate-header">
-                    <h3> Sponsor Admin</h3>
-                    <div class="price">799 <span>₽ / мес</span></div>
-                </div>
-                <ul class="donate-features">
-                    <li>🔴 Права модератора (ulx/sam меню)</li>
-                    <li>🔴 Возможность разбирать жалобы игроков</li>
-                    <li>🔴 Доступ к админ-профессиям (AdminMod)</li>
-                    <li>🔴 Уведомления о нарушениях в реальном времени</li>
-                </ul>
-                <a href="#" class="btn btn-secondary donate-btn">Купить</a>
-            </div>
-
+    <!-- Главный контейнер доната -->
+    <div class="donate-container" style="position: relative;">
+        
+        <!-- Кнопка Корзины, зафиксированная в верхнем правом углу контейнера -->
+        <div style="position: absolute; top: 10px; right: 20px;">
+            <button id="cart-btn" class="tab-btn" style="background-color: rgba(168, 85, 247, 0.1); border-color: rgba(168, 85, 247, 0.4); color: #fff; padding: 10px 24px; display: inline-flex; align-items: center; gap: 10px;">
+                <i class="fas fa-shopping-basket" style="color: #a855f7;"></i>
+                <span>Корзина</span>
+                <span id="cart-count" style="display:none; background: #ef4444; color: white; font-size: 11px; padding: 2px 7px; border-radius: 10px; font-weight: 800; line-height: 1;">0</span>
+            </button>
         </div>
-    </main>
 
+        <h1>Магазин <span>Доната</span></h1>
+        <p class="donate-subtitle">Поддержите проект и получите уникальные игровые возможности</p>
+
+        <!-- Категории товаров (Вкладки) -->
+        <div class="tabs-container" id="categories-container">
+            <button class="tab-btn active" data-category="all">Все товары</button>
+            <button class="tab-btn" data-category="donat">Привилегии</button>
+            <button class="tab-btn" data-category="weapons">Оружие</button>
+            <button class="tab-btn" data-category="currency">Валюта</button>
+        </div>
+
+        <!-- Сетка доната -->
+        <div class="donate-grid" id="products-grid">
+            <!-- Сюда JS загрузит карточки -->
+        </div>
+    </div>
+
+    <!-- Модальное окно Корзины -->
+    <div id="cart-modal" class="cart-overlay">
+        <div class="cart-sidebar">
+            <div class="cart-header">
+                <h2 style="color: #fff; font-weight: 800;"><i class="fas fa-shopping-cart accent-text"></i> Корзина</h2>
+                <button id="close-cart" style="background:transparent; border:none; color:#fff; font-size:20px; cursor:pointer;"><i class="fas fa-times"></i></button>
+            </div>
+
+            <!-- Список выбранных товаров -->
+            <div id="cart-items" class="cart-items-list">
+                <!-- Заполняется через JS -->
+            </div>
+
+            <!-- Подвал корзины -->
+            <div class="cart-footer">
+                <label style="color: #64748b; font-size: 12px; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 5px;">Ваш SteamID / Ник:</label>
+                
+
+                <div class="cart-total">
+                    <span>Итого к оплате:</span>
+                    <span class="accent-text" id="cart-total-summary">0 ₽</span>
+                </div>
+
+                <button id="checkout-btn" class="btn btn-primary" style="width: 100%;">Перейти к оплате</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Подвал сайта из вашего CSS -->
     <footer>
-        <p>&copy; 2026 NOVA RP. Все права защищены. Сервер не связан с Valve Corporation.</p>
+        &copy; 2026 NOVA RP. Все права защищены. Сервер не связан с Valve Corporation.
     </footer>
+    <!-- Скрипт логики магазина -->
+    <script>
+        // 1. Обновленная база данных товаров (Вместо кейсов — Оружие)
+        const products = [
+            { id: 'vip', name: 'VIP статус', price: 199, category: 'donat', icon: 'fa-crown', featured: false, features: ['Уникальный префикс [VIP] в чате', 'Доступ к 5+ эксклюзивным профессиям', '+25% к ежеминутной зарплате', 'Лимит пропов увеличен до 50'] },
+            { id: 'premium', name: 'PREMIUM статус', price: 399, category: 'donat', icon: 'fa-gem', featured: true, features: ['Все возможности VIP-статуса', 'Префикс [PREMIUM] золотым цветом', 'Доступ ко ВСЕМ скрытым профессиям', 'Своя точка спавна и кастомный хитмаркер', 'Иммунитет к кику за АФК'] },
+            { id: 'sponsor', name: 'Sponsor Admin', price: 799, category: 'donat', icon: 'fa-shield-halved', featured: false, features: ['Права модератора (ulx/sam меню)', 'Возможность разбирать жалобы игроков', 'Доступ к админ-профессиям (AdminMod)', 'Уведомления о нарушениях в реальном времени'] },
+            { id: 'wpn_m4a1', name: 'Автомат M4A1', price: 89, category: 'weapons', icon: 'fa-gun', featured: false, features: ['Высокая точность и глушитель в комплекте', 'Выдаётся навсегда (сохраняется после смерти)', 'Доступен для использования любой профессией'] },
+            { id: 'wpn_minigun', name: 'Тяжелый Пулемет', price: 179, category: 'weapons', icon: 'fa-jet-fighter-up', featured: false, features: ['Огромный урон и боезапас', 'Идеально подходит для удержания базы', 'Выдаётся навсегда (сохраняется после смерти)'] },
+            { id: 'money_500k', name: '500,000 Валюты', price: 300, category: 'currency', icon: 'fa-coins', featured: false, features: ['Пакет со скидкой 25%', 'Хватит на покупку бизнеса или квартиры', 'Зачисление на баланс в течение 1 минуты'] }
+        ];
 
-    <script src="auth-check.js"></script>
+        // Получаем сохраненную корзину или создаем пустую
+        let cart = JSON.parse(localStorage.getItem('nova_rp_cart')) || [];
 
+        // Получаем элементы интерфейса
+        const productsGrid = document.getElementById('products-grid');
+        const categoriesContainer = document.getElementById('categories-container');
+
+        // 2. Функция рендеринга карточек товаров
+        function renderProducts(categoryFilter = 'all') {
+            productsGrid.innerHTML = '';
+            
+            // Фильтруем массив товаров по выбранной категории
+            const filtered = categoryFilter === 'all' 
+                ? products 
+                : products.filter(p => p.category === categoryFilter);
+
+            filtered.forEach(product => {
+                const featuresHtml = product.features.map(f => `<li>• ${f}</li>`).join('');
+                const card = document.createElement('div');
+                
+                // Используем ваши классы: для PREMIUM добавляем класс featured
+                card.className = product.featured ? "donate-card featured" : "donate-card";
+                
+                card.innerHTML = `
+                    ${product.featured ? '<div class="popular-badge">Популярно</div>' : ''}
+                    <div class="donate-header">
+                        <i class="fas ${product.icon}" style="font-size: 32px; color: #a855f7; margin-bottom: 10px; display:block;"></i>
+                        <h3>${product.name}</h3>
+                        <div class="price">${product.price} <span>₽ ${product.category === 'donat' ? '/ мес' : ''}</span></div>
+                    </div>
+                    <ul class="donate-features" style="flex-grow:1;">
+                        ${featuresHtml}
+                    </ul>
+                    <button onclick="addToCart('${product.id}')" class="btn btn-primary donate-btn">В корзину</button>
+                `;
+                productsGrid.appendChild(card);
+            });
+        }
+
+        // 3. Логика переключения категорий (Вкладок)
+        categoriesContainer.addEventListener('click', (e) => {
+            const btn = e.target.closest('.tab-btn');
+            if (!btn) return;
+            
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderProducts(btn.dataset.category);
+        });
+
+        // Первичный запуск вывода товаров
+        renderProducts();
+        // ==========================================================================
+        // 4. ЛОГИКА РАБОТЫ КОРЗИНЫ И ОБНОВЛЕНИЯ ИНТЕРФЕЙСА
+        // ==========================================================================
+        
+        const cartModal = document.getElementById('cart-modal');
+        const cartBtn = document.getElementById('cart-btn');
+        const closeCart = document.getElementById('close-cart');
+        const cartItemsContainer = document.getElementById('cart-items');
+        const cartCountBadge = document.getElementById('cart-count');
+        const cartTotalSummary = document.getElementById('cart-total-summary');
+        const checkoutBtn = document.getElementById('checkout-btn');
+        const playerIdentityInput = document.getElementById('player-identity');
+
+        function updateCartUI() {
+            cartItemsContainer.innerHTML = '';
+            let total = 0;
+            let totalItems = 0;
+
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<div style="text-align:center; color:#64748b; margin-top:40px;">Корзина пуста</div>';
+                cartCountBadge.style.display = 'none';
+            } else {
+                cartCountBadge.style.display = 'inline-block';
+                cart.forEach(item => {
+                    total += item.price * item.quantity;
+                    totalItems += item.quantity;
+
+                    const row = document.createElement('div');
+                    row.className = "cart-item-row";
+                    row.innerHTML = `
+                        <div>
+                            <div style="color:#fff; font-weight:700; font-size:14px;">${item.name}</div>
+                            <div style="color:#a855f7; font-size:12px;">${item.price} ₽</div>
+                        </div>
+                        <div style="display:flex; align-items:center;">
+                            <div class="cart-item-qty">
+                                <button onclick="changeQuantity('${item.id}', -1)">-</button>
+                                <span>${item.quantity}</span>
+                                <button onclick="changeQuantity('${item.id}', 1)">+</button>
+                            </div>
+                            <button onclick="removeFromCart('${item.id}')" class="btn-trash"><i class="fas fa-trash-can"></i></button>
+                        </div>
+                    `;
+                    cartItemsContainer.appendChild(row);
+                });
+                cartCountBadge.textContent = totalItems;
+            }
+            cartTotalSummary.textContent = `${total} ₽`;
+            localStorage.setItem('nova_rp_cart', JSON.stringify(cart));
+        }
+
+        // Функции глобальной области видимости для кнопок в карточках товаров
+        window.addToCart = function(id) {
+            const product = products.find(p => p.id === id);
+            const existing = cart.find(item => item.id === id);
+            if (existing) { 
+                existing.quantity += 1; 
+            } else { 
+                cart.push({ ...product, quantity: 1 }); 
+            }
+            updateCartUI();
+        };
+
+        window.changeQuantity = function(id, change) {
+            const item = cart.find(item => item.id === id);
+            if (!item) return;
+            item.quantity += change;
+            if (item.quantity <= 0) { 
+                removeFromCart(id); 
+            } else { 
+                updateCartUI(); 
+            }
+        };
+
+        window.removeFromCart = function(id) {
+            cart = cart.filter(item => item.id !== id);
+            updateCartUI();
+        };
+
+        // Управление открытием / закрытием окна
+        cartBtn.addEventListener('click', () => cartModal.classList.add('active'));
+        closeCart.addEventListener('click', () => cartModal.classList.remove('active'));
+        cartModal.addEventListener('click', (e) => { 
+            if(e.target === cartModal) cartModal.classList.remove('active'); 
+        });
+
+        // ==========================================================================
+        // 5. ВАЛИДАЦИЯ И ОФОРМЛЕНИЕ ЗАКАЗА
+        // ==========================================================================
+        checkoutBtn.addEventListener('click', () => {
+            if (cart.length === 0) { 
+                alert('Ваша корзина пуста!'); 
+                return; 
+            }
+            const playerIdentity = playerIdentityInput.value.trim();
+            if (!playerIdentity) { 
+                alert('Пожалуйста, введите ваш SteamID или Ник для корректной выдачи!'); 
+                playerIdentityInput.focus(); 
+                return; 
+            }
+
+            const totalSum = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+            alert(`Заказ оформлен для игрока: ${playerIdentity}!\nИтоговая сумма: ${totalSum} ₽\n\nПеренаправляем на платежную систему...`);
+            
+            // Очищаем состояние после симуляции покупки
+            cart = []; 
+            playerIdentityInput.value = ''; 
+            updateCartUI(); 
+            cartModal.classList.remove('active');
+        });
+
+        // Первичный вызов для синхронизации корзины из памяти
+        updateCartUI();
+
+
+
+        // ==========================================================================
+        // ИНТЕГРАЦИЯ С ПЛАТЕЖНОЙ СИСТЕМОЙ (FREEKASSA / UNITPAY)
+        // ==========================================================================
+        checkoutBtn.addEventListener('click', () => {
+            if (cart.length === 0) { 
+                alert('Ваша корзина пуста!'); 
+                return; 
+            }
+            
+            const playerIdentity = playerIdentityInput.value.trim();
+            if (!playerIdentity) { 
+                alert('Пожалуйста, введите ваш SteamID или Ник!'); 
+                playerIdentityInput.focus(); 
+                return; 
+            }
+
+            // Настройки вашего магазина в платежной системе
+            const MERCHANT_ID = '12345'; // ИД вашего магазина во FreeKassa (получите в панели)
+            const SECRET_WORD = 'secret_key_123'; // Секретное слово №1 из настроек FreeKassa
+
+            const totalSum = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+            const orderId = 'NOVA_' + Date.now(); // Уникальный номер платежа
+            
+            // Описание платежа для отображения в чеке игроку
+            const description = `Покупка доната на NOVA RP для игрока ${playerIdentity}`;
+
+            // В реальной интеграции здесь создается хэш-подпись платежа. 
+            // Для FreeKassa формула: merchant_id + totalSum + secret_word + currency + order_id
+            // Пока сымитируем переход на платежный шлюз:
+            const paymentUrl = `https://freekassa.ru{MERCHANT_ID}&oa=${totalSum}&o=${orderId}&s=0&us_steamid=${encodeURIComponent(playerIdentity)}`;
+
+            alert(`Заказ #${orderId} успешно создан!\nИгрок: ${playerIdentity}\nСумма: ${totalSum} ₽\n\nСейчас вы будете перенаправлены на платежную систему.`);
+
+            // Очищаем корзину, чтобы игрок не оплатил дважды случайно
+            cart = []; 
+            playerIdentityInput.value = ''; 
+            updateCartUI(); 
+            cartModal.classList.remove('active');
+
+            // Перенаправляем игрока на платежную систему
+            window.location.href = paymentUrl;
+        });
+
+    </script>
 </body>
 </html>
