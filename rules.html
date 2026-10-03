@@ -29,7 +29,9 @@
 
     <main class="rules-container">
         <h1>Свод правил сервера <span class="accent-text">NOVA RP</span></h1>
-        <p class="rules-subtitle">Незнание правил не освобождает от ответственности. Пожалуйста, ознакомьтесь с ними перед игрой.</p>
+        <p class="rules-subtitle">Незнание правил не освобождает от ответственности. Пожалуйста, ознакомьтесь с ними перед игрой.
+        <a href="https://docs.google.com/document/d/1AYNZvuHGcHsXrrXP-BbRJ_cQRXgiveFNKDoIw-QJRmI/edit?usp=sharing">ссылка на Google File</a>
+        </p>
 
         <div style="text-align: center; margin-bottom: 30px;">
             <!-- Добавили id="editor-toggle-btn" и убрали изначальную видимость style="display:none;" -->
@@ -54,7 +56,7 @@
 
     <!-- Контейнер с вашим Google Документом -->
     <div class="document-container">
-        <iframe src="https://docs.google.com/document/d/e/2PACX-1vQybiS8hymgAwenBAz1Qwg6f9hdJMphu3upnuYIj5UWMMCsoZHbDMO7VFp5zzzwKu6RylNv-CXsZL37/pub?embedded=true"></iframe>
+        <iframe src="https://docs.google.com/document/d/e/2PACX-1vQybiS8hymgAwenBAz1Qwg6f9hdJMphu3upnuYIj5UWMMCsoZHbDMO7VFp5zzzwKu6RylNv-CXsZL37/pub?embedded=true" style="display: block; width: 100%; max-width: 1200px; height: 80vh; margin: 30px auto; border: none;"></iframe>
     </div>
 
     <!-- Подвал сайта из вашего CSS -->
@@ -81,7 +83,25 @@
         </div>
     </footer>
 
-    <body>
+    <style>
+    .document-container {
+        width: 100%;
+        max-width: 800px;        /* Ограничиваем общую ширину для удобства чтения */
+        margin: 30px auto;        /* Центрируем контейнер на сайте */
+        padding: 0 15px;          /* Отступы, чтобы на телефонах код не лип к краям */
+        box-sizing: border-box;
+    }
+
+    .document-container iframe {
+        display: block;
+        width: 100%;
+        height: 80vh;             /* Высота окна (80% от экрана) */
+        border: none;
+        border-radius: 8px;       /* Слегка скруглим углы белого листа, чтобы выглядело аккуратно */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Добавит красивую тень на темном фоне */
+    }
+
+    </style>
 
 </body>
 
