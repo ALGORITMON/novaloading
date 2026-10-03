@@ -166,7 +166,7 @@
                     <h3>${member.nick}</h3>
                     <p class="job-desc" style="margin-bottom: 15px;">${member.desc}</p>
                     <div class="job-stats" style="margin-top: auto; padding-top: 15px;">
-                        <div><span>Discord:</span> <strong style="color: #6366f1;">${member.discord}</strong></div>
+                        <div><span>Связь:</span> <strong style="color: #6366f1;">${member.discord}</strong></div>
                     </div>
                 `;
 
@@ -191,7 +191,7 @@
             const discord = document.getElementById('admin-discord').value;
             const desc = document.getElementById('admin-desc').value;
 
-            if (!nick.trim() || !discord.trim()) return alert("Заполните хотя бы никнейм и Discord!");
+            if (!nick.trim() || !discord.trim()) return alert("Заполните хотя бы никнейм и Связь!");
 
             teamData.push({ nick, rank, avatar, discord, desc: desc || "Участник команды сервера NOVA RP." });
             
@@ -224,7 +224,7 @@
     <h3>${member.nick}</h3>
     <p class="job-desc" style="margin-bottom: 15px;">${member.desc}</p>
     <div class="job-stats" style="margin-top: auto; padding-top: 15px;">
-      <div><span>Discord:</span> <strong style="color: #6366f1;">${member.discord}</strong></div>
+      <div><span>Связь:</span> <strong style="color: #6366f1;">${member.discord}</strong></div>
     </div>
   </div>`;
             });
