@@ -48,11 +48,10 @@
                 
                 <!-- Выбор ранга для красивого цвета бейджика -->
                 <select id="admin-rank" style="width:100%; background:rgba(5,2,10,0.6); border:1px solid rgba(138,92,246,0.3); padding:12px; color:#fff; border-radius:4px; font-family:inherit; margin-bottom: 10px;">
-                    <option value="creator">Создатель проекта</option>
-                    <option value="dev">Разработчик</option>
-                    <option value="head">Гл. Администратор</option>
-                    <option value="admin">Администратор</option>
-                    <option value="mod">Модератор</option>
+                    <option value="creator">Руководитель</option>
+                    <option value="man">Управляющий</option>
+                    <option value="tech">Тех. Специалист</option>
+                    <option value="head">Ст. Администратор</option>
                 </select>
 
                 <input type="text" id="admin-avatar" placeholder="Ссылка на аватарку (или оставь пустым для стандартной)">
@@ -115,8 +114,8 @@
         // Перевод рангов для вывода текста
         const rankLabels = {
             creator: "Руководитель",
-            dev: "Управляющий",
-            tecx: "Тех. Специалист"
+            man: "Управляющий",
+            tech: "Тех. Специалист"
             head: "Ст. Администратор",
         };
 
