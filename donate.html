@@ -7,7 +7,7 @@
     <!-- Подключаем ваш файл стилей -->
     <link rel="stylesheet" href="style.css">
     <!-- Подключаем иконки FontAwesome (они нужны для карточек) -->
-    <link rel="stylesheet" href="https://cloudflare.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <!-- Стили исключительно для новой корзины -->
     <style>
@@ -137,10 +137,29 @@
         </div>
     </div>
 
-    <!-- Подвал сайта из вашего CSS -->
+        <!-- Подвал сайта из вашего CSS -->
     <footer>
-        &copy; 2026 NOVA RP. Все права защищены. Сервер не связан с Valve Corporation.
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div class="footer-logo">NOVA <span>RP</span></div>
+                <p class="footer-desc">Игровой проект в Garry's Mod</p>
+            </div>
+            <div class="footer-col">
+                <h4>Документы</h4>
+                <a href="terms.pdf">Пользовательское соглашение</a>
+                <a href="privacy.pdf">Политика конфиденциальности</a>
+            </div>
+            <div class="footer-col">
+                <h4>Поддержка</h4>
+                <a href="mailto:novarpgmod.support@gmail.com">novarpgmod.support@gmail.com</a>
+                <a href="faq.html">FAQ</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2026 NOVA RP. Все права защищены.
+        </div>
     </footer>
+
     <!-- Скрипт логики магазина -->
     <script>
         // 1. Обновленная база данных товаров (Вместо кейсов — Оружие)

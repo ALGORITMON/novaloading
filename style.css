@@ -419,14 +419,77 @@ nav a:hover, nav a.active {
    5. ПОДВАЛ (FOOTER)
    ========================================================================== */
 footer {
-    text-align: center;
-    padding: 40px;
-    border-top: 1px solid rgba(138, 92, 246, 0.1);
-    font-size: 13px;
-    font-weight: 600;
-    color: #4b5563;
-    letter-spacing: 1px;
+    margin-top: 100px;
+    padding: 50px 30px 25px;
+    border-top: 1px solid rgba(138, 92, 246, 0.15);
+    background: rgba(5, 2, 10, 0.4);
 }
+.footer-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.footer-col h4 {
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0 0 16px 0;
+}
+.footer-col a,
+.footer-col p {
+    display: block;
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 13px;
+    line-height: 1.8;
+    margin: 0 0 4px 0;
+    transition: color 0.2s;
+}
+.footer-col a:hover {
+    color: #a855f7;
+}
+.footer-logo {
+    font-size: 24px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+.footer-logo span {
+    color: #a855f7;
+    text-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
+}
+.footer-desc {
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.5;
+}
+.footer-bottom {
+    max-width: 1200px;
+    margin: 40px auto 0;
+    padding-top: 20px;
+    border-top: 1px solid rgba(138, 92, 246, 0.1);
+    text-align: center;
+    font-size: 12px;
+    color: #475569;
+}
+@media (max-width: 768px) {
+    .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
+}
+@media (max-width: 480px) {
+    .footer-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
 
 /* ==========================================================================
    6. АДАПТИВНОСТЬ
